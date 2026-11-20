@@ -1,0 +1,4089 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>當代中文課程 1 — Học Tiếng Trung Phồn Thể Khoa Học (Đài Loan)</title>
+  <meta name="description" content="Ứng dụng học tiếng Trung Phồn thể theo giáo trình Đương Đại 1 (當代中文課程 1) với lộ trình 4 bước khoa học: Từ vựng, Đặt câu, Luyện nói AI chấm phát âm zh-TW và Kiểm tra." />
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+/* ==========================================================================
+   當代中文課程 1 — Design System & Layout Architecture (Vanilla CSS)
+   Aesthetic: Taiwanese Editorial Minimalism (Warm Paper, Vermilion Seal, Jade)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+
+body {
+  --bg: var(--background, hsl(38, 28%, 97%));
+  --bg-subtle: var(--sidebar, hsl(36, 22%, 93%));
+  --surface: var(--card, hsl(0, 0%, 100%));
+  --surface-hover: var(--content, hsl(36, 25%, 98%));
+  --text: var(--foreground, hsl(220, 24%, 14%));
+  --text-secondary: var(--muted-foreground, hsl(220, 14%, 38%));
+  --text-muted: var(--placeholder, hsl(220, 10%, 54%));
+  --border-strong: var(--border, hsl(34, 16%, 78%));
+  --primary: hsl(8, 74%, 50%);
+  --primary-hover: hsl(8, 74%, 44%);
+  --primary-soft: hsla(8, 75%, 52%, 0.12);
+  --primary-text: hsl(8, 72%, 42%);
+  --jade: hsl(160, 64%, 36%);
+  --jade-soft: hsla(160, 60%, 40%, 0.13);
+  --jade-border: hsla(160, 50%, 42%, 0.35);
+  --amber: hsl(34, 88%, 44%);
+  --amber-soft: hsla(36, 90%, 50%, 0.14);
+  --amber-border: hsla(36, 80%, 48%, 0.38);
+  --ocean: hsl(212, 72%, 46%);
+  --ocean-soft: hsla(212, 80%, 52%, 0.13);
+  --shadow-xs: 0 1px 2px rgba(20, 24, 34, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(20, 24, 34, 0.06);
+  --shadow-md: 0 10px 28px -6px rgba(20, 24, 34, 0.08);
+  --shadow-lg: 0 20px 44px -12px rgba(20, 24, 34, 0.14);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-hanzi: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  
+}
+
+.hanzi {
+  font-family: var(--font-hanzi);
+  letter-spacing: 0.04em;
+}
+
+button, input, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   1. Top Navigation & Pedagogical Stepper Bar
+   ========================================================================== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-seal {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: #fff;
+  font-family: var(--font-hanzi);
+  font-weight: 900;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-xs);
+  flex-shrink: 0;
+}
+
+.brand-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* 4-Step Curriculum Navigation */
+.step-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-subtle);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.step-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.step-tab:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+.step-tab.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+.step-tab.active .step-num {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Right Toolbar Pills */
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-xs);
+}
+
+.pill-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.pill-btn.pill-primary {
+  background: var(--primary-soft);
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+  color: var(--primary-text);
+}
+
+.pill-btn.pill-alert {
+  background: var(--amber-soft);
+  border-color: var(--amber-border);
+  color: var(--amber);
+}
+
+.pill-btn.pill-jade {
+  background: var(--jade-soft);
+  border-color: var(--jade-border);
+  color: var(--jade);
+}
+
+/* Subtle 1-Line Comeback Strip (Dismissible, non-intrusive) */
+.comeback-strip {
+  background: var(--amber-soft);
+  border-bottom: 1px solid var(--amber-border);
+  padding: 8px 20px;
+  font-size: 13px;
+}
+
+.comeback-strip-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   2. Main Workspace Container
+   ========================================================================== */
+.workspace {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+/* Context Sub-Header inside Workspace */
+.stage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.stage-title-group h1,
+.stage-title-group h2 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.stage-title-group p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Segmented Mode Switcher */
+.segmented {
+  display: inline-flex;
+  background: var(--bg-subtle);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  gap: 3px;
+}
+
+.seg-btn {
+  padding: 6px 13px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.seg-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-compact {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-xs);
+}
+
+/* Badges & Tags */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.tag-primary {
+  background: var(--primary-soft);
+  color: var(--primary-text);
+}
+
+.tag-jade {
+  background: var(--jade-soft);
+  color: var(--jade);
+}
+
+.tag-amber {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.btn-sm {
+  padding: 7px 12px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+  padding: 13px 24px;
+  font-size: 15px;
+  border-radius: var(--radius-md);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-jade {
+  background: var(--jade);
+  color: #fff;
+}
+
+.btn-jade:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.btn-outline {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--bg-subtle);
+  border-color: var(--border-strong);
+}
+
+.btn-subtle {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.btn-subtle:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--border);
+}
+
+/* ==========================================================================
+   3. Step 1: Vocabulary & Grammar Layout
+   ========================================================================== */
+.vocab-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.flashcard-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 24px;
+  position: relative;
+}
+
+.hanzi-display {
+  font-family: var(--font-hanzi);
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--text);
+  margin: 10px 0 6px;
+}
+
+.pinyin-display {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+.meaning-display {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.example-box {
+  width: 100%;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  text-align: left;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+}
+
+.vocab-list-panel {
+  max-height: 460px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.vocab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: left;
+  width: 100%;
+}
+
+.vocab-row:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+
+.vocab-row.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+/* ==========================================================================
+   4. Step 2: Sentence Builder & Reading Translation
+   ========================================================================== */
+.prompt-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+
+.answer-well {
+  min-height: 68px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border-strong);
+  background: var(--bg);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  transition: border-color 0.16s ease;
+}
+
+.answer-well.filled {
+  border-style: solid;
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.word-tile {
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 2px 0 var(--border);
+}
+
+.word-tile:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.word-tile.tile-picked {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: none;
+}
+
+.input-field {
+  width: 100%;
+  padding: 11px 15px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* ==========================================================================
+   5. Step 3: Speaking Studio (zh-TW)
+   ========================================================================== */
+.speak-hero {
+  text-align: center;
+  padding: 24px 20px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+}
+
+.speak-hanzi-line {
+  font-family: var(--font-hanzi);
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1.3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: 12px 0 8px;
+}
+
+.speak-char {
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.speak-char:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.speak-char.char-active {
+  background: var(--amber);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.speak-char.char-done {
+  color: var(--jade);
+}
+
+.mic-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  flex-wrap: wrap;
+}
+
+.btn-mic-recording {
+  background: hsl(0, 78%, 52%) !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 4px hsla(0, 78%, 52%, 0.22) !important;
+  animation: pulse-ring 1.4s infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 3px hsla(0, 78%, 52%, 0.22); }
+  50% { box-shadow: 0 0 0 8px hsla(0, 78%, 52%, 0.1); }
+}
+
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 28px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+}
+
+.waveform span {
+  width: 4px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--primary);
+  transition: height 0.08s ease;
+}
+
+/* Character Evaluation Cards */
+.char-eval-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.char-eval-card {
+  min-width: 72px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: var(--surface);
+}
+
+.char-eval-card.status-exact {
+  border-color: var(--jade-border);
+  background: var(--jade-soft);
+}
+
+.char-eval-card.status-near {
+  border-color: var(--amber-border);
+  background: var(--amber-soft);
+}
+
+.char-eval-card.status-missing {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  background: var(--primary-soft);
+}
+
+/* ==========================================================================
+   6. Modals / Drawers (Scope Filter & Progress/5-Day Comeback)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(15, 18, 28, 0.48);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 680px;
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px 26px;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vocab-grid {
+    grid-template-columns: 1fr;
+  }
+  .hanzi-display {
+    font-size: 44px;
+  }
+  .speak-hanzi-line {
+    font-size: 28px;
+  }
+  .card {
+    padding: 20px;
+  }
+  .step-nav {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+  </style>
+</head>
+<body>
+  <!-- ========================================================================
+       1. TOP NAVIGATION BAR (Compact, Single-Row Scientific Stepper)
+       ======================================================================== -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-seal" aria-hidden="true">當</div>
+        <div>
+          <div class="brand-title">當代中文課程 1</div>
+          <div class="brand-subtitle">Tiếng Trung Phồn Thể • Lộ trình 4 bước</div>
+        </div>
+      </div>
+
+      <nav class="step-nav" aria-label="Lộ trình học 4 bước">
+        <button id="nav-step-vocab" onclick="App.setStep('vocab')" class="step-tab active">
+          <span class="step-num">1</span>
+          <span>詞彙 Từ vựng</span>
+        </button>
+        <button id="nav-step-sentence" onclick="App.setStep('sentence')" class="step-tab">
+          <span class="step-num">2</span>
+          <span>造句 Đặt &amp; Dịch câu</span>
+        </button>
+        <button id="nav-step-speak" onclick="App.setStep('speak')" class="step-tab">
+          <span class="step-num">3</span>
+          <span>口說 Luyện nói</span>
+        </button>
+        <button id="nav-step-test" onclick="App.setStep('test')" class="step-tab">
+          <span class="step-num">4</span>
+          <span>測驗 Kiểm tra</span>
+        </button>
+      </nav>
+
+      <div class="toolbar-actions">
+        <button onclick="App.openScopeModal()" class="pill-btn pill-primary" title="Chọn bài học và giới hạn từ vựng">
+          <span>📚</span>
+          <span id="top-scope-summary">Bài 1–4 (46 từ)</span>
+        </button>
+        <button onclick="App.cycleVoiceGender()" class="pill-btn" title="Bấm để đổi giọng Nữ (雅婷) / Nam (雲哲) / Song thanh">
+          <span id="top-voice-summary">👩 Nữ (雅婷) • 1x</span>
+        </button>
+        <button id="top-comeback-btn" onclick="App.openComebackModal()" class="pill-btn pill-alert" title="Nhiệm vụ phá băng sau 5 ngày nghỉ">
+          🔥 Nghỉ 5 ngày (0/3)
+        </button>
+        <button onclick="App.toggleTheme()" class="pill-btn" title="Đổi giao diện Sáng / Tối">
+          🌗
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Subtle 1-Line Comeback Strip (Can be dismissed or opened into modal) -->
+  <div id="comeback-strip" class="comeback-strip">
+    <div class="comeback-strip-inner">
+      <div>
+        <strong>🔔 Nhắc học sau 5 ngày nghỉ:</strong> Chỉ cần hoàn thành 3 bước ngắn (2 thẻ từ, 1 câu ghép, 1 câu nói) để khôi phục nhịp độ học tiếng Trung Phồn thể!
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button onclick="App.openComebackModal()" class="btn btn-sm btn-primary">Mở lộ trình 15 phút</button>
+        <button onclick="App.dismissComebackStrip()" class="btn btn-sm btn-subtle" title="Ẩn thanh nhắc">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       2. MAIN FOCUSED STUDY WORKSPACE
+       ======================================================================== -->
+  <main class="workspace">
+    <!-- ======================================================================
+         STEP 1: 詞彙 TỪ VỰNG & NGỮ PHÁP
+         ====================================================================== -->
+    <section id="panel-step-vocab">
+      <div class="stage-header">
+        <div class="stage-title-group">
+          <h1>Bước 1: 詞彙 Từ vựng &amp; Ngữ pháp cốt lõi</h1>
+          <p>Nắm vững mặt chữ Phồn thể, phiên âm Pinyin và cấu trúc ngữ pháp trong phạm vi bài đã chọn.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="segmented">
+            <button id="vsub-flashcard" onclick="App.setVocabSubMode('flashcard')" class="seg-btn active">🗂️ Thẻ từ vựng</button>
+            <button id="vsub-grammar" onclick="App.setVocabSubMode('grammar')" class="seg-btn">📐 Công thức ngữ pháp</button>
+          </div>
+          <button onclick="App.openScopeModal()" class="btn btn-sm btn-outline">⚙️ Giới hạn bài / từ</button>
+        </div>
+      </div>
+
+      <!-- 1A. Flashcard + Scoped Word List -->
+      <div id="vocab-flashcard-view" class="vocab-grid">
+        <div class="card flashcard-hero">
+          <div style="width:100%;display:flex;align-items:center;justify-content:space-between;">
+            <span id="vc-tag" class="tag tag-primary">Bài 1 • Phần 1</span>
+            <span id="vc-counter" class="tag">1 / 46</span>
+          </div>
+
+          <div id="vc-scene" style="margin-top:14px;"></div>
+          <div id="vc-hanzi" class="hanzi-display">請問</div>
+          <div id="vc-pinyin" class="pinyin-display">qǐngwèn</div>
+          <div id="vc-meaning" class="meaning-display">Xin hỏi</div>
+
+          <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:8px;">
+            <button onclick="App.speakCurrentVocab('female', false)" class="btn btn-sm btn-primary">👩 Giọng Nữ (雅婷)</button>
+            <button onclick="App.speakCurrentVocab('male', false)" class="btn btn-sm btn-outline">👨 Giọng Nam (雲哲)</button>
+            <button onclick="App.speakCurrentVocab(null, true)" class="btn btn-sm btn-subtle">🐢 Đọc chậm (0.72x)</button>
+            <button onclick="App.practiceSpeakCurrentVocab()" class="btn btn-sm btn-outline">🎙️ Tập phát âm từ này</button>
+          </div>
+
+          <div class="example-box">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+              <span style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Câu ví dụ trong giáo trình</span>
+              <button onclick="App.speakCurrentVocabExample()" class="tag tag-primary">🔊 Nghe câu</button>
+            </div>
+            <div id="vc-ex-zh" class="hanzi" style="font-size:19px;font-weight:800;">請問您貴姓？</div>
+            <div id="vc-ex-py" style="font-size:13px;color:var(--primary);font-weight:600;">Qǐngwèn nín guìxìng?</div>
+            <div id="vc-ex-vi" style="font-size:13px;color:var(--text-secondary);">Xin hỏi quý danh của ngài là gì?</div>
+          </div>
+
+          <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:18px;padding-top:14px;border-top:1px solid var(--border);">
+            <button onclick="App.stepVocab(-1)" class="btn btn-outline">⬅ Từ trước</button>
+            <button onclick="App.setStep('sentence')" class="btn btn-subtle">Sang Bước 2: Đặt câu ➔</button>
+            <button onclick="App.stepVocab(1)" class="btn btn-primary">Từ tiếp theo ➔</button>
+          </div>
+        </div>
+
+        <aside class="card-compact">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <strong style="font-size:14px;">Danh sách từ trong phạm vi</strong>
+            <button onclick="App.openScopeModal()" class="tag">Lọc từ</button>
+          </div>
+          <div id="vc-side-list" class="vocab-list-panel"></div>
+        </aside>
+      </div>
+
+      <!-- 1B. Grammar View -->
+      <div id="vocab-grammar-view" class="hidden">
+        <div id="grammar-list-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         STEP 2: 造句 ĐẶT CÂU (VIỆT -> TRUNG) & ĐỌC DỊCH (TRUNG -> VIỆT)
+         ====================================================================== -->
+    <section id="panel-step-sentence" class="hidden">
+      <div class="stage-header">
+        <div class="stage-title-group">
+          <h2>Bước 2: 造句 Đặt câu &amp; Đọc dịch hai chiều</h2>
+          <p>Luyện phản xạ chuyển từ ý tiếng Việt sang câu chữ Hán Phồn thể và đọc dịch câu giao tiếp.</p>
+        </div>
+        <div class="segmented">
+          <button id="ssub-v2z" onclick="App.setSentenceSubMode('v2z')" class="seg-btn active">🇻🇳 ➔ 🇹🇼 Việt sang Trung</button>
+          <button id="ssub-z2v" onclick="App.setSentenceSubMode('z2v')" class="seg-btn">🇹🇼 ➔ 🇻🇳 Trung sang Việt</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <span id="sent-tag" class="tag tag-primary">Bài 1 (P.1) • Hỏi quý danh</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="App.stepSentence(-1)" class="btn btn-sm btn-outline">⬅ Câu trước</button>
+            <span id="sent-counter" class="tag">Câu 1 / 9</span>
+            <button onclick="App.stepSentence(1)" class="btn btn-sm btn-outline">Câu tiếp ➔</button>
+          </div>
+        </div>
+
+        <!-- 2A. Vietnamese -> Chinese Sentence Builder -->
+        <div id="sent-v2z-view">
+          <div class="prompt-box">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Hãy dịch câu tiếng Việt sau sang tiếng Trung Phồn thể</div>
+            <div id="v2z-vi-prompt" style="font-size:20px;font-weight:800;">Xin hỏi quý danh của ngài là gì? Tôi họ Vương, tên là Vương Minh Hoa.</div>
+            <div id="v2z-hint" style="font-size:13px;color:var(--text-secondary);margin-top:6px;">💡 Công thức: 請問您貴姓？ + 我姓...，叫...</div>
+          </div>
+
+          <div id="v2z-answer-well" class="answer-well"></div>
+
+          <div id="v2z-tile-bank" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;"></div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding-top:14px;border-top:1px solid var(--border);">
+            <input id="v2z-manual-input" type="text" class="input-field hanzi" style="flex:1;min-width:240px;" placeholder="Hoặc tự gõ câu chữ Hán Phồn thể vào đây..." onkeydown="if(event.key==='Enter') App.checkV2ZAnswer()" />
+            <button onclick="App.resetV2Z()" class="btn btn-outline">↺ Xóa làm lại</button>
+            <button onclick="App.speakCurrentSentence()" class="btn btn-subtle">🔊 Nghe gợi ý</button>
+            <button onclick="App.checkV2ZAnswer()" class="btn btn-primary">✓ Kiểm tra đáp án</button>
+          </div>
+
+          <div id="v2z-feedback" class="card-compact hidden" style="margin-top:16px;"></div>
+        </div>
+
+        <!-- 2B. Chinese -> Vietnamese Reading & Translation -->
+        <div id="sent-z2v-view" class="hidden">
+          <div class="prompt-box" style="text-align:center;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">Chạm vào từng cụm chữ Hán để nghe phát âm &amp; xem nghĩa từng từ</div>
+            <div id="z2v-gloss-segments" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:12px;"></div>
+            <div id="z2v-pinyin" style="font-size:15px;color:var(--primary);font-weight:700;margin-bottom:12px;"></div>
+            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+              <button onclick="App.speakCurrentSentence('female', false)" class="btn btn-sm btn-primary">👩 Giọng Nữ đọc</button>
+              <button onclick="App.speakCurrentSentence('male', false)" class="btn btn-sm btn-outline">👨 Giọng Nam đọc</button>
+              <button onclick="App.speakCurrentSentence(null, true)" class="btn btn-sm btn-subtle">🐢 Đọc chậm (0.72x)</button>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:10px;">Chọn bản dịch tiếng Việt đúng nhất:</div>
+          <div id="z2v-options" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div id="z2v-feedback" class="card-compact hidden" style="margin-top:16px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         STEP 3: 口說 PHÒNG LUYỆN NÓI & AI CHẤM PHÁT ÂM (zh-TW)
+         ====================================================================== -->
+    <section id="panel-step-speak" class="hidden">
+      <div class="stage-header">
+        <div class="stage-title-group">
+          <h2>Bước 3: 口說 Phòng luyện nói &amp; Chấm phát âm (zh-TW)</h2>
+          <p>Thu âm trực tiếp giọng nói của bạn và chấm chi tiết từng chữ Hán Phồn thể &amp; thanh điệu.</p>
+        </div>
+        <div class="segmented">
+          <button id="spk-sub-sentence" onclick="App.setSpeakSubMode('sentence')" class="seg-btn active">🗣️ Luyện câu</button>
+          <button id="spk-sub-word" onclick="App.setSpeakSubMode('word')" class="seg-btn">🔤 Luyện từ</button>
+          <button id="spk-sub-roleplay" onclick="App.setSpeakSubMode('roleplay')" class="seg-btn">🎭 Hội thoại</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Top Item Navigation -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <span id="spk-tag" class="tag tag-primary">Bài 1 (P.1) • Luyện nói câu</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <a id="spk-open-https-top" href="https://hunghp2002.github.io/hoc-tieng-trung-phon-the/" target="_blank" rel="noopener" class="btn btn-sm btn-outline hidden">🔗 Mở ở tab riêng (HTTPS) để dùng Micro</a>
+            <button onclick="App.stepSpeak(-1)" class="btn btn-sm btn-outline">⬅ Trước</button>
+            <span id="spk-counter" class="tag">Mục 1 / 9</span>
+            <button onclick="App.stepSpeak(1)" class="btn btn-sm btn-outline">Tiếp ➔</button>
+          </div>
+        </div>
+
+        <!-- Roleplay Partner Prompt (Only shown in Roleplay submode) -->
+        <div id="spk-roleplay-box" class="card-compact hidden" style="margin-bottom:14px;background:var(--ocean-soft);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div id="spk-rp-speaker" style="font-size:12px;font-weight:800;color:var(--ocean);">🧑‍🏫 Đối tác Đài Loan</div>
+              <div id="spk-rp-qzh" class="hanzi" style="font-size:20px;font-weight:800;margin-top:2px;"></div>
+              <div id="spk-rp-qpy" style="font-size:13px;color:var(--text-secondary);"></div>
+            </div>
+            <button onclick="App.speakRoleplayPartner()" class="btn btn-sm btn-outline">🔊 Nghe câu hỏi</button>
+          </div>
+        </div>
+
+        <!-- Target Sentence Hero -->
+        <div class="speak-hero">
+          <div style="font-size:12px;color:var(--text-muted);font-weight:700;">CHẠM VÀO TỪNG CHỮ HÁN ĐỂ NGHE PHÁT ÂM RIÊNG CHỮ ĐÓ</div>
+          <div id="spk-target-zh" class="speak-hanzi-line"></div>
+          <div id="spk-target-py" style="font-size:17px;font-weight:700;color:var(--primary);margin-bottom:4px;"></div>
+          <div id="spk-target-vi" style="font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:14px;"></div>
+
+          <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+            <button onclick="App.speakTargetAudio('female', false)" class="btn btn-sm btn-outline">👩 Nghe mẫu Nữ (雅婷)</button>
+            <button onclick="App.speakTargetAudio('male', false)" class="btn btn-sm btn-outline">👨 Nghe mẫu Nam (雲哲)</button>
+            <button onclick="App.speakTargetAudio(null, true)" class="btn btn-sm btn-subtle">🐢 Nghe mẫu chậm (0.7x)</button>
+          </div>
+          <div id="spk-tip" style="font-size:13px;color:var(--text-secondary);margin-top:12px;"></div>
+        </div>
+
+        <!-- Primary Microphone Recording Bar -->
+        <div class="mic-bar">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button id="spk-mic-btn" onclick="App.toggleMic()" class="btn btn-lg btn-primary">
+              <span>🎙️</span>
+              <span>Bấm để nói (zh-TW)</span>
+            </button>
+            <button id="spk-playback-btn" onclick="SpeechService.playLastRecording()" class="btn btn-outline hidden">
+              ▶️ Nghe lại giọng vừa thu
+            </button>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div id="spk-waveform" class="waveform" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <span id="spk-status" style="font-size:13px;font-weight:700;color:var(--text-secondary);">Sẵn sàng thu âm</span>
+          </div>
+        </div>
+
+        <!-- Diagnostic Banner (Only shown if Microphone is blocked by iframe/browser) -->
+        <div id="spk-diag-box" class="card-compact hidden" style="margin-top:14px;background:var(--amber-soft);border-color:var(--amber-border);">
+          <div id="spk-diag-text" style="font-size:13px;font-weight:600;margin-bottom:10px;"></div>
+          <a id="spk-diag-link" href="https://hunghp2002.github.io/hoc-tieng-trung-phon-the/" target="_blank" rel="noopener" class="btn btn-sm btn-primary">🔗 Mở Phòng Thu Âm ở tab riêng (HTTPS)</a>
+        </div>
+
+        <!-- Recognized Speech Input & Optional Demo Triggers -->
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text-secondary);">
+            <span>📝 Câu chữ Hán nhận diện từ giọng nói của bạn (có thể dùng phím 🎤 trên bàn phím để nói trực tiếp):</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Xem thử cách chấm:</span>
+              <button onclick="App.runDemoSpeech('perfect')" class="tag tag-jade">Mẫu chuẩn</button>
+              <button onclick="App.runDemoSpeech('near')" class="tag tag-amber">Mẫu lệch thanh</button>
+              <button onclick="App.runDemoSpeech('wrong')" class="tag tag-primary">Mẫu thiếu chữ</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <input id="spk-input" type="text" class="input-field hanzi" style="flex:1;min-width:240px;font-weight:700;" placeholder="Chữ Hán máy nghe được sẽ hiện tại đây..." oninput="App.handleSpeakInputLive(this.value)" onkeydown="if(event.key==='Enter') App.evaluateCurrentSpeech(this.value)" />
+            <button onclick="App.evaluateCurrentSpeech()" class="btn btn-jade">🔍 Chấm phát âm</button>
+          </div>
+        </div>
+
+        <!-- Pronunciation Scorecard Result -->
+        <div id="spk-eval-card" class="card-compact hidden" style="margin-top:18px;">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--border);">
+            <div id="spk-score-badge" style="width:58px;height:58px;border-radius:14px;background:var(--jade);color:#fff;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">100%</div>
+            <div>
+              <div id="spk-verdict-title" style="font-size:16px;font-weight:800;">🏆 Phát âm rất chuẩn Đài Loan!</div>
+              <div id="spk-verdict-sub" style="font-size:13px;color:var(--text-secondary);"></div>
+            </div>
+          </div>
+
+          <div id="spk-char-grid" class="char-eval-grid"></div>
+          <div id="spk-teacher-notes" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;display:flex;flex-direction:column;gap:4px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         STEP 4: 測驗 KIỂM TRA PHẢN XẠ & TIẾN ĐỘ HỌC TẬP
+         ====================================================================== -->
+    <section id="panel-step-test" class="hidden">
+      <div class="stage-header">
+        <div class="stage-title-group">
+          <h2>Bước 4: 測驗 Kiểm tra phản xạ &amp; Tiến độ</h2>
+          <p>Củng cố trí nhớ dài hạn qua trò chơi ghép thẻ, bắt lỗi ngữ pháp và theo dõi mục tiêu hàng ngày.</p>
+        </div>
+        <div class="segmented">
+          <button id="tsub-match" onclick="App.setTestSubMode('match')" class="seg-btn active">🀄 Ghép thẻ</button>
+          <button id="tsub-detective" onclick="App.setTestSubMode('detective')" class="seg-btn">🕵️ Bắt lỗi câu</button>
+          <button id="tsub-quiz" onclick="App.setTestSubMode('quiz')" class="seg-btn">⚡ Trắc nghiệm</button>
+          <button id="tsub-progress" onclick="App.setTestSubMode('progress')" class="seg-btn">📊 Tiến độ</button>
+        </div>
+      </div>
+
+      <!-- 4A. Match Game -->
+      <div id="test-view-match" class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div>
+            <strong style="font-size:16px;">Ghép cặp Chữ Hán Phồn Thể &amp; Nghĩa Tiếng Việt</strong>
+            <div style="font-size:13px;color:var(--text-secondary);">Chạm 1 thẻ chữ Hán và 1 thẻ nghĩa tương ứng trong phạm vi bài đang học.</div>
+          </div>
+          <button onclick="App.initMatchGame()" class="btn btn-sm btn-outline">🔄 Đổi bộ thẻ</button>
+        </div>
+        <div id="match-board" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;"></div>
+      </div>
+
+      <!-- 4B. Grammar Detective -->
+      <div id="test-view-detective" class="card hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <span id="det-tag" class="tag tag-primary">Bài 1 • Bắt lỗi ngữ pháp</span>
+          <button onclick="App.nextDetective()" class="btn btn-sm btn-outline">Câu khác ➔</button>
+        </div>
+        <div class="prompt-box" style="text-align:center;">
+          <div style="font-size:12px;font-weight:700;color:var(--primary-text);">CÂU DƯỚI ĐÂY ĐANG CÓ 1 LỖI NGỮ PHÁP — HÃY CHỌN CÁCH SỬA ĐÚNG:</div>
+          <div id="det-wrong-zh" class="hanzi" style="font-size:28px;font-weight:900;margin-top:8px;"></div>
+        </div>
+        <div id="det-options" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div id="det-feedback" class="card-compact hidden" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- 4C. Quick Quiz -->
+      <div id="test-view-quiz" class="card hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <span class="tag tag-jade" id="qq-score">Đúng 0 / 0 lượt</span>
+          <button onclick="App.nextQuickQuiz()" class="btn btn-sm btn-outline">Đổi câu ➔</button>
+        </div>
+        <div class="prompt-box" style="text-align:center;">
+          <div id="qq-hanzi" class="hanzi" style="font-size:44px;font-weight:900;"></div>
+          <div id="qq-pinyin" style="font-size:16px;color:var(--primary);font-weight:700;"></div>
+        </div>
+        <div id="qq-options" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;"></div>
+        <div id="qq-feedback" class="card-compact hidden" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- 4D. Progress & Study Plan -->
+      <div id="test-view-progress" class="card hidden">
+        <h3 style="font-size:17px;font-weight:800;margin-bottom:14px;">Bảng tổng kết phiên học hôm nay</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:20px;">
+          <div class="card-compact">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:700;">TỪ VỰNG ĐÃ ÔN</div>
+            <div id="prog-vocab-count" style="font-size:24px;font-weight:900;margin-top:4px;">0 từ</div>
+          </div>
+          <div class="card-compact">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:700;">CÂU ĐÃ HOÀN THÀNH</div>
+            <div id="prog-sent-count" style="font-size:24px;font-weight:900;margin-top:4px;">0 câu</div>
+          </div>
+          <div class="card-compact">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:700;">ĐIỂM PHÁT ÂM TB</div>
+            <div id="prog-speak-avg" style="font-size:24px;font-weight:900;margin-top:4px;color:var(--primary);">Chưa thu</div>
+          </div>
+          <div class="card-compact">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:700;">ĐỘ CHÍNH XÁC QUIZ</div>
+            <div id="prog-quiz-acc" style="font-size:24px;font-weight:900;margin-top:4px;color:var(--jade);">100%</div>
+          </div>
+        </div>
+        <div class="card-compact" style="background:var(--bg-subtle);">
+          <div style="font-weight:800;margin-bottom:4px;">💡 Gợi ý phương pháp học khoa học (當代中文課程 1):</div>
+          <p style="font-size:13px;color:var(--text-secondary);">
+            Mỗi buổi chỉ cần chọn <strong>1 bài (hoặc nửa bài)</strong> trong mục <em>Giới hạn phạm vi</em>, đi tuần tự từ Bước 1 (lật 5–8 từ vựng) ➔ Bước 2 (đặt 3 câu) ➔ Bước 3 (đọc to 3 câu vào Micro để chỉnh thanh điệu) ➔ Bước 4 (ghép thẻ 2 phút).
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       3. MODAL 1: LESSON & VOCABULARY SCOPE FILTER + VOICE SETTINGS
+       ======================================================================== -->
+  <div id="modal-scope" class="modal-backdrop hidden" onclick="if(event.target===this) App.closeScopeModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:18px;font-weight:800;">📚 Giới hạn phạm vi bài học &amp; Giọng đọc</h3>
+          <p style="font-size:13px;color:var(--text-secondary);">Mọi từ vựng, câu ghép, câu luyện nói và bài kiểm tra sẽ chỉ xuất hiện trong phạm vi bạn chọn.</p>
+        </div>
+        <button onclick="App.closeScopeModal()" class="btn btn-sm btn-subtle">Đóng ✕</button>
+      </div>
+
+      <!-- Voice Settings -->
+      <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <strong style="font-size:14px;">🔊 Giọng đọc mẫu Đài Loan (zh-TW)</strong>
+          <div style="font-size:12px;color:var(--text-secondary);">Chọn giọng Nữ, giọng Nam hoặc Song thanh</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div class="segmented">
+            <button id="voice-opt-female" onclick="App.setVoiceOption('female', null)" class="seg-btn active">👩 Nữ (雅婷)</button>
+            <button id="voice-opt-male" onclick="App.setVoiceOption('male', null)" class="seg-btn">👨 Nam (雲哲)</button>
+            <button id="voice-opt-duet" onclick="App.setVoiceOption('duet', null)" class="seg-btn">👫 Song thanh</button>
+          </div>
+          <div class="segmented">
+            <button id="rate-opt-0_8" onclick="App.setVoiceOption(null, 0.8)" class="seg-btn">0.8x</button>
+            <button id="rate-opt-1" onclick="App.setVoiceOption(null, 1.0)" class="seg-btn active">1.0x</button>
+            <button id="rate-opt-1_15" onclick="App.setVoiceOption(null, 1.15)" class="seg-btn">1.15x</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lesson Selection -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <strong style="font-size:14px;">1. Chọn bài học (Bài 1 – Bài 4)</strong>
+        <button onclick="App.handleSelectAllLessons()" class="tag tag-primary">Chọn tất cả Bài 1–4</button>
+      </div>
+      <div id="scope-lessons-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;margin-bottom:16px;"></div>
+
+      <!-- Half-Lesson Part Filter -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <strong style="font-size:14px;">2. Giới hạn theo nửa bài (Lộ trình 2 ngày / bài)</strong>
+        <div class="segmented">
+          <button id="scope-part-ALL" onclick="App.handlePartFilter('ALL')" class="seg-btn active">Cả bài (P.1 + P.2)</button>
+          <button id="scope-part-1" onclick="App.handlePartFilter(1)" class="seg-btn">Chỉ nửa đầu (P.1)</button>
+          <button id="scope-part-2" onclick="App.handlePartFilter(2)" class="seg-btn">Chỉ nửa sau (P.2)</button>
+        </div>
+      </div>
+
+      <!-- Individual Word Filter -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <strong style="font-size:14px;">3. Bật / tắt từng từ vựng cụ thể</strong>
+        <div style="display:flex;gap:6px;">
+          <button onclick="App.handleSetAllWords(true)" class="tag">Bật tất cả từ</button>
+          <button onclick="App.handleSetAllWords(false)" class="tag">Bỏ chọn bớt</button>
+        </div>
+      </div>
+      <div id="scope-words-grid" style="display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow-y:auto;padding:4px;"></div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+        <button onclick="App.closeScopeModal()" class="btn btn-primary">✓ Áp dụng phạm vi học</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       4. MODAL 2: 5-DAY COMEBACK MISSION & 15-MINUTE FOCUS TIMER
+       ======================================================================== -->
+  <div id="modal-comeback" class="modal-backdrop hidden" onclick="if(event.target===this) App.closeComebackModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:18px;font-weight:800;">🔥 Lộ trình phá băng sau 5 ngày nghỉ học</h3>
+          <p style="font-size:13px;color:var(--text-secondary);">Khởi động nhẹ nhàng trong 15 phút để lấy lại cảm giác chữ Hán Phồn thể và thanh điệu.</p>
+        </div>
+        <button onclick="App.closeComebackModal()" class="btn btn-sm btn-subtle">Đóng ✕</button>
+      </div>
+
+      <!-- 15-Minute Focus Timer -->
+      <div class="card-compact" style="background:var(--bg-subtle);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Đồng hồ tập trung Pomodoro</div>
+          <div id="focus-timer-display" style="font-size:32px;font-weight:900;color:var(--primary);">15:00</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="focus-timer-btn" onclick="App.toggleFocusTimer()" class="btn btn-primary">▶️ Bắt đầu 15 phút tập trung</button>
+          <button onclick="VoiceService.speak('加油！你已經五天沒學中文了，我們現在開始複習吧！', 'female')" class="btn btn-outline">👩 Cô 雅婷 nhắc học</button>
+          <button onclick="VoiceService.speak('別放棄！每天練習十五分鐘，你的繁體中文一定會進步！', 'male')" class="btn btn-outline">👨 Thầy 雲哲 khích lệ</button>
+        </div>
+      </div>
+
+      <strong style="font-size:14px;display:block;margin-bottom:8px;">3 mục tiêu ngắn cần hoàn thành hôm nay:</strong>
+      <div id="comeback-task-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"></div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-top:14px;border-top:1px solid var(--border);">
+        <button onclick="App.triggerInstantComeback()" class="btn btn-jade">⚡ Cam kết học ngay &amp; Kích hoạt đồng hồ</button>
+        <button onclick="App.closeComebackModal()" class="btn btn-outline">Quay lại bài học</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+/**
+ * ============================================================================
+ * MODULE 1: CURRICULUM DATA (當代中文課程 1 — 100% 繁體中文)
+ * Structured scientifically by Lesson (1..4) and Half-Lesson (Part 1 & Part 2)
+ * ============================================================================
+ */
+window.CurriculumDB = (function () {
+  "use strict";
+
+  const LESSONS_META = [
+    {
+      id: 1,
+      titleZh: "第一課：歡迎你來臺灣！",
+      titleVi: "Bài 1: Chào mừng bạn đến Đài Loan!",
+      goal: "Chào hỏi, hỏi quý danh, quốc tịch và đồ uống yêu thích (Trà Ô Long, Trà sữa trân châu).",
+      part1Topic: "Nửa đầu (P.1): Hỏi họ tên & Quốc tịch (請問、貴姓、哪國人)",
+      part2Topic: "Nửa sau (P.2): Đồ uống Đài Loan & Câu hỏi 嗎 / 呢 (喜歡、喝茶、珍珠奶茶)"
+    },
+    {
+      id: 2,
+      titleZh: "第二課：我的家人",
+      titleVi: "Bài 2: Gia đình của tôi",
+      goal: "Giới thiệu thành viên gia đình, nghề nghiệp, lượng từ 張 / 個 và sở hữu Có/Không có (有 / 沒有).",
+      part1Topic: "Nửa đầu (P.1): Thành viên gia đình & Lượng từ (這張照片、兩個人)",
+      part2Topic: "Nửa sau (P.2): Nghề nghiệp & Phó từ 都 (老師、醫生、大學生)"
+    },
+    {
+      id: 3,
+      titleZh: "第三課：週末做什麼？",
+      titleVi: "Bài 3: Cuối tuần làm gì?",
+      goal: "Lên kế hoạch cuối tuần, thể thao, giải trí, mời ăn tối và cấu trúc thời gian.",
+      part1Topic: "Nửa đầu (P.1): Hoạt động cuối tuần & Thể thao (打網球、看電影、聽音樂)",
+      part2Topic: "Nửa sau (P.2): Ăn uống, mời mọc & Rủ rê (請客、臺灣菜、一起去吧)"
+    },
+    {
+      id: 4,
+      titleZh: "第四課：請問一共多少錢？",
+      titleVi: "Bài 4: Thời tiết bốn mùa & Mua sắm",
+      goal: "Miêu tả thời tiết bốn mùa, cảm nhận 覺得, so sánh 沒有...那麼... và hỏi giá tiền.",
+      part1Topic: "Nửa đầu (P.1): Thời tiết bốn mùa & So sánh (春天、夏天、覺得、舒服)",
+      part2Topic: "Nửa sau (P.2): Mua sắm, giá tiền & Số lượng (多少錢、太貴了、手機)"
+    }
+  ];
+
+  // Clean, cohesive SVG scene illustrations for flashcards & sentences
+  const SCENE_SVGS = {
+    greeting: `<svg viewBox="0 0 240 110" width="220" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="240" height="110" rx="14" fill="hsl(36,35%,94%)"/>
+      <circle cx="195" cy="28" r="14" fill="hsl(12,78%,62%)" opacity="0.25"/>
+      <path d="M115 22L122 38H108L115 22Z" fill="hsl(8,72%,48%)"/>
+      <rect x="109" y="38" width="12" height="48" rx="2" fill="hsl(200,32%,36%)"/>
+      <circle cx="72" cy="48" r="14" fill="hsl(24,55%,45%)"/>
+      <rect x="56" y="65" width="32" height="28" rx="8" fill="hsl(8,72%,50%)"/>
+      <circle cx="164" cy="48" r="14" fill="hsl(220,30%,32%)"/>
+      <rect x="148" y="65" width="32" height="28" rx="8" fill="hsl(160,55%,36%)"/>
+      <rect x="86" y="18" width="68" height="22" rx="6" fill="#fff" stroke="hsl(34,20%,82%)"/>
+      <text x="120" y="33" text-anchor="middle" font-size="11" font-weight="700" fill="hsl(8,72%,42%)">你好！請問貴姓？</text>
+    </svg>`,
+    tea: `<svg viewBox="0 0 240 110" width="220" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="240" height="110" rx="14" fill="hsl(36,35%,94%)"/>
+      <rect x="64" y="42" width="44" height="46" rx="10" fill="hsl(158,48%,38%)"/>
+      <path d="M108 52H118C122 52 122 72 118 72H108" stroke="hsl(158,48%,38%)" stroke-width="5"/>
+      <path d="M78 32C78 24 84 24 84 18M92 32C92 24 98 24 98 18" stroke="hsl(34,60%,55%)" stroke-width="2.5" stroke-linecap="round"/>
+      <rect x="138" y="34" width="38" height="54" rx="8" fill="hsl(32,72%,72%)" stroke="hsl(28,45%,42%)" stroke-width="2"/>
+      <line x1="157" y1="16" x2="157" y2="42" stroke="hsl(8,72%,48%)" stroke-width="5" stroke-linecap="round"/>
+      <circle cx="148" cy="78" r="3.5" fill="hsl(24,45%,22%)"/><circle cx="158" cy="80" r="3.5" fill="hsl(24,45%,22%)"/><circle cx="166" cy="77" r="3.5" fill="hsl(24,45%,22%)"/>
+    </svg>`,
+    family: `<svg viewBox="0 0 240 110" width="220" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="240" height="110" rx="14" fill="hsl(36,35%,94%)"/>
+      <rect x="42" y="16" width="156" height="78" rx="10" fill="#fff" stroke="hsl(32,35%,70%)" stroke-width="3"/>
+      <circle cx="80" cy="48" r="11" fill="hsl(212,45%,42%)"/><rect x="67" y="62" width="26" height="22" rx="6" fill="hsl(212,45%,42%)"/>
+      <circle cx="120" cy="48" r="11" fill="hsl(8,68%,52%)"/><rect x="107" y="62" width="26" height="22" rx="6" fill="hsl(8,68%,52%)"/>
+      <circle cx="160" cy="52" r="9" fill="hsl(158,52%,38%)"/><rect x="149" y="64" width="22" height="20" rx="6" fill="hsl(158,52%,38%)"/>
+    </svg>`,
+    weekend: `<svg viewBox="0 0 240 110" width="220" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="240" height="110" rx="14" fill="hsl(36,35%,94%)"/>
+      <circle cx="85" cy="54" r="24" stroke="hsl(8,72%,48%)" stroke-width="3.5" fill="hsl(38,40%,98%)"/>
+      <line x1="68" y1="38" x2="102" y2="70" stroke="hsl(34,20%,75%)" stroke-width="1.5"/>
+      <line x1="102" y1="38" x2="68" y2="70" stroke="hsl(34,20%,75%)" stroke-width="1.5"/>
+      <circle cx="145" cy="60" r="13" fill="hsl(158,62%,42%)"/>
+      <path d="M136 53C142 58 142 62 136 67M154 53C148 58 148 62 154 67" stroke="#fff" stroke-width="2"/>
+    </svg>`,
+    seasons: `<svg viewBox="0 0 240 110" width="220" height="100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="240" height="110" rx="14" fill="hsl(36,35%,94%)"/>
+      <circle cx="76" cy="46" r="18" fill="hsl(34,90%,54%)"/>
+      <path d="M135 66C135 55 144 48 154 48C163 48 171 54 172 63C178 63 182 67 182 73C182 79 177 82 171 82H138C131 82 127 77 127 71C127 66 131 64 135 66Z" fill="hsl(210,55%,62%)"/>
+      <path d="M55 86Q95 72 135 86T205 84" stroke="hsl(158,52%,38%)" stroke-width="4" stroke-linecap="round"/>
+    </svg>`
+  };
+
+  // Core Vocabulary Database (Lessons 1–4, Part 1 & Part 2 — 100% Traditional Chinese)
+  const VOCAB_DB = [
+    // LESSON 1 - PART 1
+    { id: "v1_1", lesson: 1, part: 1, hz: "請問", py: "qǐngwèn", vi: "Xin hỏi", pos: "Động từ", scene: "greeting", exZh: "請問您貴姓？", exPy: "Qǐngwèn nín guìxìng?", exVi: "Xin hỏi quý danh của ngài là gì?" },
+    { id: "v1_2", lesson: 1, part: 1, hz: "貴姓", py: "guìxìng", vi: "Quý danh (hỏi họ lịch sự)", pos: "Danh/Động", scene: "greeting", exZh: "請問你貴姓？", exPy: "Qǐngwèn nǐ guìxìng?", exVi: "Xin hỏi bạn họ gì?" },
+    { id: "v1_3", lesson: 1, part: 1, hz: "名字", py: "míngzi", vi: "Tên", pos: "Danh từ", scene: "greeting", exZh: "你叫什麼名字？", exPy: "Nǐ jiào shénme míngzi?", exVi: "Bạn tên là gì?" },
+    { id: "v1_4", lesson: 1, part: 1, hz: "小姐", py: "xiǎojiě", vi: "Cô, tiểu thư", pos: "Danh từ", scene: "greeting", exZh: "陳小姐是臺灣人。", exPy: "Chén xiǎojiě shì Táiwānrén.", exVi: "Cô Trần là người Đài Loan." },
+    { id: "v1_5", lesson: 1, part: 1, hz: "先生", py: "xiānsheng", vi: "Ông, ngài, tiên sinh", pos: "Danh từ", scene: "greeting", exZh: "王先生你好！", exPy: "Wáng xiānsheng nǐ hǎo!", exVi: "Xin chào ông Vương!" },
+    { id: "v1_6", lesson: 1, part: 1, hz: "臺灣", py: "Táiwān", vi: "Đài Loan", pos: "Danh từ riêng", scene: "greeting", exZh: "歡迎你來臺灣！", exPy: "Huānyíng nǐ lái Táiwān!", exVi: "Chào mừng bạn đến Đài Loan!" },
+    { id: "v1_7", lesson: 1, part: 1, hz: "越南", py: "Yuènán", vi: "Việt Nam", pos: "Danh từ riêng", scene: "greeting", exZh: "我是越南人。", exPy: "Wǒ shì Yuènánrén.", exVi: "Tôi là người Việt Nam." },
+    { id: "v1_8", lesson: 1, part: 1, hz: "哪國人", py: "nǎ guó rén", vi: "Người nước nào", pos: "Cụm danh từ", scene: "greeting", exZh: "請問你是哪國人？", exPy: "Qǐngwèn nǐ shì nǎ guó rén?", exVi: "Xin hỏi bạn là người nước nào?" },
+
+    // LESSON 1 - PART 2
+    { id: "v1_9", lesson: 1, part: 2, hz: "喜歡", py: "xǐhuān", vi: "Thích", pos: "Động từ", scene: "tea", exZh: "我很喜歡喝臺灣茶。", exPy: "Wǒ hěn xǐhuān hē Táiwān chá.", exVi: "Tôi rất thích uống trà Đài Loan." },
+    { id: "v1_10", lesson: 1, part: 2, hz: "喝茶", py: "hē chá", vi: "Uống trà", pos: "Động-Tân", scene: "tea", exZh: "你喜歡喝茶嗎？", exPy: "Nǐ xǐhuān hē chá ma?", exVi: "Bạn có thích uống trà không?" },
+    { id: "v1_11", lesson: 1, part: 2, hz: "咖啡", py: "kāfēi", vi: "Cà phê", pos: "Danh từ", scene: "tea", exZh: "我不喝咖啡，我喝茶。", exPy: "Wǒ bù hē kāfēi, wǒ hē chá.", exVi: "Tôi không uống cà phê, tôi uống trà." },
+    { id: "v1_12", lesson: 1, part: 2, hz: "烏龍茶", py: "wūlóngchá", vi: "Trà Ô Long", pos: "Danh từ", scene: "tea", exZh: "臺灣的烏龍茶很好喝。", exPy: "Táiwān de wūlóngchá hěn hǎohē.", exVi: "Trà Ô Long của Đài Loan rất ngon." },
+    { id: "v1_13", lesson: 1, part: 2, hz: "珍珠奶茶", py: "zhēnzhū nǎichá", vi: "Trà sữa trân châu", pos: "Danh từ", scene: "tea", exZh: "我也很喜歡喝珍珠奶茶。", exPy: "Wǒ yě hěn xǐhuān hē zhēnzhū nǎichá.", exVi: "Tôi cũng rất thích uống trà sữa trân châu." },
+    { id: "v1_14", lesson: 1, part: 2, hz: "歡迎", py: "huānyíng", vi: "Hoan nghênh, chào mừng", pos: "Động từ", scene: "greeting", exZh: "歡迎你們來我家！", exPy: "Huānyíng nǐmen lái wǒ jiā!", exVi: "Chào mừng các bạn đến nhà tôi!" },
+
+    // LESSON 2 - PART 1
+    { id: "v2_1", lesson: 2, part: 1, hz: "照片", py: "zhàopiàn", vi: "Bức ảnh", pos: "Danh từ", scene: "family", exZh: "這張照片很好看。", exPy: "Zhè zhāng zhàopiàn hěn hǎokàn.", exVi: "Bức ảnh này rất đẹp." },
+    { id: "v2_2", lesson: 2, part: 1, hz: "張", py: "zhāng", vi: "Tấm, bức (lượng từ vật phẳng)", pos: "Lượng từ", scene: "family", exZh: "我有兩張家人的照片。", exPy: "Wǒ yǒu liǎng zhāng jiārén de zhàopiàn.", exVi: "Tôi có hai bức ảnh gia đình." },
+    { id: "v2_3", lesson: 2, part: 1, hz: "家人", py: "jiārén", vi: "Người nhà, gia đình", pos: "Danh từ", scene: "family", exZh: "他們都是我的家人。", exPy: "Tāmen dōu shì wǒ de jiārén.", exVi: "Họ đều là người nhà của tôi." },
+    { id: "v2_4", lesson: 2, part: 1, hz: "爸爸", py: "bàba", vi: "Bố, ba", pos: "Danh từ", scene: "family", exZh: "我爸爸是醫生。", exPy: "Wǒ bàba shì yīshēng.", exVi: "Bố tôi là bác sĩ." },
+    { id: "v2_5", lesson: 2, part: 1, hz: "媽媽", py: "māma", vi: "Mẹ, má", pos: "Danh từ", scene: "family", exZh: "我媽媽是老師。", exPy: "Wǒ māma shì lǎoshī.", exVi: "Mẹ tôi là giáo viên." },
+    { id: "v2_6", lesson: 2, part: 1, hz: "哥哥", py: "gēge", vi: "Anh trai", pos: "Danh từ", scene: "family", exZh: "我有一個哥哥。", exPy: "Wǒ yǒu yí ge gēge.", exVi: "Tôi có một người anh trai." },
+    { id: "v2_7", lesson: 2, part: 1, hz: "姐姐", py: "jiějie", vi: "Chị gái", pos: "Danh từ", scene: "family", exZh: "我姐姐很漂亮。", exPy: "Wǒ jiějie hěn piàoliang.", exVi: "Chị gái tôi rất xinh đẹp." },
+    { id: "v2_8", lesson: 2, part: 1, hz: "兩", py: "liǎng", vi: "Hai (đi trước lượng từ)", pos: "Số từ", scene: "family", exZh: "我家有兩個人。", exPy: "Wǒ jiā yǒu liǎng ge rén.", exVi: "Nhà tôi có hai người." },
+
+    // LESSON 2 - PART 2
+    { id: "v2_9", lesson: 2, part: 2, hz: "老師", py: "lǎoshī", vi: "Giáo viên, thầy/cô giáo", pos: "Danh từ", scene: "family", exZh: "王老師教我們中文。", exPy: "Wáng lǎoshī jiāo wǒmen Zhōngwén.", exVi: "Thầy Vương dạy chúng tôi tiếng Trung." },
+    { id: "v2_10", lesson: 2, part: 2, hz: "醫生", py: "yīshēng", vi: "Bác sĩ", pos: "Danh từ", scene: "family", exZh: "他爸爸也是醫生嗎？", exPy: "Tā bàba yě shì yīshēng ma?", exVi: "Bố anh ấy cũng là bác sĩ phải không?" },
+    { id: "v2_11", lesson: 2, part: 2, hz: "大學生", py: "dàxuéshēng", vi: "Sinh viên đại học", pos: "Danh từ", scene: "family", exZh: "我和妹妹都是大學生。", exPy: "Wǒ hé mèimei dōu shì dàxuéshēng.", exVi: "Tôi và em gái đều là sinh viên đại học." },
+    { id: "v2_12", lesson: 2, part: 2, hz: "漂亮", py: "piàoliang", vi: "Xinh đẹp", pos: "Tính từ", scene: "family", exZh: "這張照片很漂亮！", exPy: "Zhè zhāng zhàopiàn hěn piàoliang!", exVi: "Bức ảnh này đẹp quá!" },
+    { id: "v2_13", lesson: 2, part: 2, hz: "都", py: "dōu", vi: "Đều", pos: "Phó từ", scene: "family", exZh: "我們都喜歡學中文。", exPy: "Wǒmen dōu xǐhuān xué Zhōngwén.", exVi: "Chúng tôi đều thích học tiếng Trung." },
+    { id: "v2_14", lesson: 2, part: 2, hz: "沒有", py: "méiyǒu", vi: "Không có", pos: "Động từ", scene: "family", exZh: "我沒有弟弟，我有妹妹。", exPy: "Wǒ méiyǒu dìdi, wǒ yǒu mèimei.", exVi: "Tôi không có em trai, tôi có em gái." },
+
+    // LESSON 3 - PART 1
+    { id: "v3_1", lesson: 3, part: 1, hz: "週末", py: "zhōumò", vi: "Cuối tuần", pos: "Danh từ", scene: "weekend", exZh: "這個週末你做什麼？", exPy: "Zhège zhōumò nǐ zuò shénme?", exVi: "Cuối tuần này bạn làm gì?" },
+    { id: "v3_2", lesson: 3, part: 1, hz: "常", py: "cháng", vi: "Thường, hay", pos: "Phó từ", scene: "weekend", exZh: "我週末常跟朋友去運動。", exPy: "Wǒ zhōumò cháng gēn péngyou qù yùndòng.", exVi: "Cuối tuần tôi thường đi tập thể thao với bạn." },
+    { id: "v3_3", lesson: 3, part: 1, hz: "打網球", py: "dǎ wǎngqiú", vi: "Đánh quần vợt (tennis)", pos: "Động-Tân", scene: "weekend", exZh: "他喜歡跟朋友去打網球。", exPy: "Tā xǐhuān gēn péngyou qù dǎ wǎngqiú.", exVi: "Anh ấy thích đi đánh quần vợt với bạn." },
+    { id: "v3_4", lesson: 3, part: 1, hz: "打籃球", py: "dǎ lánqiú", vi: "Chơi bóng rổ", pos: "Động-Tân", scene: "weekend", exZh: "我們下午一起去打籃球吧！", exPy: "Wǒmen xiàwǔ yìqǐ qù dǎ lánqiú ba!", exVi: "Chiều nay chúng mình cùng đi chơi bóng rổ nhé!" },
+    { id: "v3_5", lesson: 3, part: 1, hz: "看電影", py: "kàn diànyǐng", vi: "Xem phim điện ảnh", pos: "Động-Tân", scene: "weekend", exZh: "我常跟家人去看臺灣電影。", exPy: "Wǒ cháng gēn jiārén qù kàn Táiwān diànyǐng.", exVi: "Tôi thường đi xem phim Đài Loan với gia đình." },
+    { id: "v3_6", lesson: 3, part: 1, hz: "聽音樂", py: "tīng yīnyuè", vi: "Nghe nhạc", pos: "Động-Tân", scene: "weekend", exZh: "我在家看書、聽音樂。", exPy: "Wǒ zài jiā kànshū, tīng yīnyuè.", exVi: "Tôi ở nhà đọc sách, nghe nhạc." },
+    { id: "v3_7", lesson: 3, part: 1, hz: "運動", py: "yùndòng", vi: "Tập thể thao, vận động", pos: "Động/Danh", scene: "weekend", exZh: "你常做什麼運動？", exPy: "Nǐ cháng zuò shénme yùndòng?", exVi: "Bạn thường chơi môn thể thao gì?" },
+
+    // LESSON 3 - PART 2
+    { id: "v3_8", lesson: 3, part: 2, hz: "請客", py: "qǐngkè", vi: "Mời khách, đãi tiệc", pos: "Động-Tân", scene: "weekend", exZh: "今天晚上我請客！", exPy: "Jīntiān wǎnshàng wǒ qǐngkè!", exVi: "Tối nay tôi khao nhé!" },
+    { id: "v3_9", lesson: 3, part: 2, hz: "臺灣菜", py: "Táiwāncài", vi: "Món ăn Đài Loan", pos: "Danh từ", scene: "weekend", exZh: "我們一起去吃臺灣菜吧！", exPy: "Wǒmen yìqǐ qù chī Táiwāncài ba!", exVi: "Chúng ta cùng đi ăn món Đài Loan nhé!" },
+    { id: "v3_10", lesson: 3, part: 2, hz: "越南菜", py: "Yuènáncài", vi: "Món ăn Việt Nam", pos: "Danh từ", scene: "weekend", exZh: "我也喜歡吃越南菜。", exPy: "Wǒ yě xǐhuān chī Yuènáncài.", exVi: "Tôi cũng thích ăn món Việt Nam." },
+    { id: "v3_11", lesson: 3, part: 2, hz: "時候", py: "shíhou", vi: "Khi, lúc (...的時候)", pos: "Danh từ", scene: "weekend", exZh: "週末的時候，我常去看電影。", exPy: "Zhōumò de shíhou, wǒ cháng qù kàn diànyǐng.", exVi: "Vào dịp cuối tuần, tôi thường đi xem phim." },
+    { id: "v3_12", lesson: 3, part: 2, hz: "一起", py: "yìqǐ", vi: "Cùng nhau", pos: "Phó từ", scene: "weekend", exZh: "我們晚上一起去吃晚飯吧。", exPy: "Wǒmen wǎnshàng yìqǐ qù chī wǎnfàn ba.", exVi: "Tối nay chúng mình cùng đi ăn tối nhé." },
+
+    // LESSON 4 - PART 1
+    { id: "v4_1", lesson: 4, part: 1, hz: "天氣", py: "tiānqì", vi: "Thời tiết", pos: "Danh từ", scene: "seasons", exZh: "今天的天氣很好。", exPy: "Jīntiān de tiānqì hěn hǎo.", exVi: "Thời tiết hôm nay rất đẹp." },
+    { id: "v4_2", lesson: 4, part: 1, hz: "春天", py: "chūntiān", vi: "Mùa xuân", pos: "Danh từ", scene: "seasons", exZh: "我覺得春天很舒服。", exPy: "Wǒ juéde chūntiān hěn shūfu.", exVi: "Tôi cảm thấy mùa xuân rất dễ chịu." },
+    { id: "v4_3", lesson: 4, part: 1, hz: "夏天", py: "xiàtiān", vi: "Mùa hè", pos: "Danh từ", scene: "seasons", exZh: "臺灣的夏天非常熱。", exPy: "Táiwān de xiàtiān fēicháng rè.", exVi: "Mùa hè ở Đài Loan vô cùng nóng." },
+    { id: "v4_4", lesson: 4, part: 1, hz: "覺得", py: "juéde", vi: "Cảm thấy, cho rằng", pos: "Động từ", scene: "seasons", exZh: "你覺得這杯茶怎麼樣？", exPy: "Nǐ juéde zhè bēi chá zěnmeyàng?", exVi: "Bạn thấy ly trà này thế nào?" },
+    { id: "v4_5", lesson: 4, part: 1, hz: "舒服", py: "shūfu", vi: "Thoải mái, dễ chịu", pos: "Tính từ", scene: "seasons", exZh: "秋天的天氣非常舒服。", exPy: "Qiūtiān de tiānqì fēicháng shūfu.", exVi: "Thời tiết mùa thu vô cùng dễ chịu." },
+    { id: "v4_6", lesson: 4, part: 1, hz: "非常", py: "fēicháng", vi: "Vô cùng, cực kỳ", pos: "Phó từ", scene: "seasons", exZh: "那裡的冬天非常冷。", exPy: "Nàlǐ de dōngtiān fēicháng lěng.", exVi: "Mùa đông ở đó cực kỳ lạnh." },
+
+    // LESSON 4 - PART 2
+    { id: "v4_7", lesson: 4, part: 2, hz: "多少錢", py: "duōshǎo qián", vi: "Bao nhiêu tiền", pos: "Cụm nghi vấn", scene: "seasons", exZh: "請問這支手機多少錢？", exPy: "Qǐngwèn zhè zhī shǒujī duōshǎo qián?", exVi: "Xin hỏi chiếc điện thoại này bao nhiêu tiền?" },
+    { id: "v4_8", lesson: 4, part: 2, hz: "一共", py: "yígòng", vi: "Tổng cộng", pos: "Phó từ", scene: "seasons", exZh: "請問一共多少錢？", exPy: "Qǐngwèn yígòng duōshǎo qián?", exVi: "Xin hỏi tổng cộng bao nhiêu tiền?" },
+    { id: "v4_9", lesson: 4, part: 2, hz: "太貴了", py: "tài guì le", vi: "Đắt quá rồi", pos: "Cấu trúc 太...了", scene: "seasons", exZh: "那支手機太貴了！", exPy: "Nà zhī shǒujī tài guì le!", exVi: "Chiếc điện thoại đó đắt quá!" },
+    { id: "v4_10", lesson: 4, part: 2, hz: "便宜", py: "piányi", vi: "Rẻ", pos: "Tính từ", scene: "seasons", exZh: "這家店的東西很便宜。", exPy: "Zhè jiā diàn de dōngxi hěn piányi.", exVi: "Đồ của cửa hàng này rất rẻ." }
+  ];
+
+  // Core Grammar Formulas by Lesson & Part
+  const GRAMMAR_DB = [
+    {
+      lesson: 1, part: 1,
+      title: "Hỏi quý danh & Quốc tịch (請問 / 貴姓 / 是...不是)",
+      formula: "Chủ ngữ + 是 / 不是 + Quốc tịch / Danh từ",
+      note: "『貴姓』chỉ dùng để hỏi họ của đối phương (請問您貴姓？). Khi trả lời tuyệt đối không nói 『我貴姓...』 mà chỉ nói 『我姓...』.",
+      exZh: "請問您貴姓？我姓王，我是越南人。",
+      exVi: "Xin hỏi quý danh của ngài? Tôi họ Vương, tôi là người Việt Nam."
+    },
+    {
+      lesson: 1, part: 2,
+      title: "Câu hỏi Có...không với 嗎 & Câu hỏi nối tiếp 呢",
+      formula: "Mệnh đề trần thuật + 嗎？ / Danh từ + 呢？",
+      note: "Khi đã có từ để hỏi (什麼、哪國) thì KHÔNG dùng 嗎 ở cuối câu.",
+      exZh: "我喜歡喝烏龍茶，你呢？你喜歡喝珍珠奶茶嗎？",
+      exVi: "Tôi thích uống trà Ô Long, còn bạn? Bạn có thích uống trà sữa trân châu không?"
+    },
+    {
+      lesson: 2, part: 1,
+      title: "Lượng từ 張 / 個 & Phân biệt 二 và 兩",
+      formula: "這 / 那 + (Số từ) + Lượng từ (張 / 個) + Danh từ",
+      note: "Khi chỉ số lượng 2 đi trước lượng từ (個、張、家...), bắt buộc dùng 『兩』(liǎng), không dùng 『二』.",
+      exZh: "這張照片有兩個人，他們是我的家人。",
+      exVi: "Bức ảnh này có hai người, họ là người nhà của tôi."
+    },
+    {
+      lesson: 2, part: 2,
+      title: "Phủ định sở hữu 沒有 & Phó từ tổng괄 都",
+      formula: "Chủ ngữ (số nhiều) + 都 / 也 + Động từ",
+      note: "Động từ 『有』 chỉ phủ định bằng 『沒有』 (tuyệt đối không dùng 不有). Phó từ 『都』 luôn đứng SAU chủ ngữ và TRƯỚC động từ.",
+      exZh: "我沒有哥哥，我和妹妹都是大學生。",
+      exVi: "Tôi không có anh trai, tôi và em gái đều là sinh viên đại học."
+    },
+    {
+      lesson: 3, part: 1,
+      title: "Trật tự thời gian, tần suất 常 & Đi cùng ai 跟",
+      formula: "Chủ ngữ + Thời gian + 常 + 跟 + Người + 去 + Động từ",
+      note: "Trạng ngữ chỉ thời gian (週末) và cụm 『跟 + Người』 luôn đặt TRƯỚC động từ chính.",
+      exZh: "我週末常跟朋友去打網球、看電影。",
+      exVi: "Cuối tuần tôi thường đi đánh quần vợt, xem phim với bạn bè."
+    },
+    {
+      lesson: 3, part: 2,
+      title: "Cấu trúc khi/lúc ...的時候 & Rủ rê 一起...吧",
+      formula: "Động/Danh + 的時候，Chủ ngữ + 一起 + Động từ + 吧！",
+      note: "Trợ từ 『吧』 ở cuối câu dùng để rủ rê nhẹ nhàng, lịch sự.",
+      exZh: "今天晚上我請客，我們一起去吃臺灣菜吧！",
+      exVi: "Tối nay tôi mời, chúng mình cùng đi ăn món Đài Loan nhé!"
+    },
+    {
+      lesson: 4, part: 1,
+      title: "So sánh kém hơn 沒有...那麼... & Cảm nhận 覺得",
+      formula: "A + 沒有 + B + (那麼) + Tính từ",
+      note: "Dùng để diễn đạt A không đạt tới mức độ của B (ví dụ: mùa hè không dễ chịu như mùa xuân).",
+      exZh: "那裡的夏天非常熱，我覺得沒有春天那麼舒服。",
+      exVi: "Mùa hè ở đó vô cùng nóng, tôi thấy không dễ chịu như mùa xuân."
+    },
+    {
+      lesson: 4, part: 2,
+      title: "Cảm thán mức độ 太 + Tính từ + 了 & Hỏi giá 多少錢",
+      formula: "Chủ ngữ + 太 + Tính từ + 了！ / 一共多少錢？",
+      note: "Khi phủ định 『不太 + Tính từ』 thì bỏ 『了』 ở cuối câu.",
+      exZh: "請問這兩杯珍珠奶茶一共多少錢？太好喝了！",
+      exVi: "Xin hỏi hai ly trà sữa trân châu này tổng cộng bao nhiêu tiền? Ngon quá!"
+    }
+  ];
+
+  // Unified Sentence Database (Used for Step 2 V2Z, Z2V and Step 3 Speaking)
+  const SENTENCES_DB = [
+    {
+      id: "s1_1", lesson: 1, part: 1, scene: "greeting",
+      tag: "Bài 1 (P.1) • Hỏi quý danh & Tên",
+      zh: "請問您貴姓？我姓王，叫王明華。",
+      py: "Qǐngwèn nín guìxìng? Wǒ xìng Wáng, jiào Wáng Mínghuá.",
+      vi: "Xin hỏi quý danh của ngài là gì? Tôi họ Vương, tên là Vương Minh Hoa.",
+      hint: "Công thức: 請問您貴姓？ + 我姓...，叫...",
+      tiles: ["請問", "您", "貴姓", "？", "我", "姓王", "，", "叫", "王明華", "。"],
+      gloss: [
+        { w: "請問", py: "qǐngwèn", vi: "Xin hỏi" },
+        { w: "您貴姓？", py: "nín guìxìng?", vi: "quý danh của ngài?" },
+        { w: "我姓王，", py: "wǒ xìng Wáng,", vi: "Tôi họ Vương," },
+        { w: "叫王明華。", py: "jiào Wáng Mínghuá.", vi: "tên là Vương Minh Hoa." }
+      ]
+    },
+    {
+      id: "s1_2", lesson: 1, part: 1, scene: "greeting",
+      tag: "Bài 1 (P.1) • Quốc tịch & Phủ định 不是",
+      zh: "我不是日本人，我是越南人。你呢？",
+      py: "Wǒ bú shì Rìběnrén, wǒ shì Yuènánrén. Nǐ ne?",
+      vi: "Tôi không phải là người Nhật Bản, tôi là người Việt Nam. Thế còn bạn?",
+      hint: "Phủ định của 是 là 不是; hỏi ngược lại ngắn gọn bằng 你呢？",
+      tiles: ["我", "不是", "日本人", "，", "我是", "越南人", "。", "你呢", "？"],
+      gloss: [
+        { w: "我不是", py: "wǒ bú shì", vi: "Tôi không phải là" },
+        { w: "日本人，", py: "Rìběnrén,", vi: "người Nhật Bản," },
+        { w: "我是越南人。", py: "wǒ shì Yuènánrén.", vi: "tôi là người Việt Nam." },
+        { w: "你呢？", py: "nǐ ne?", vi: "Thế còn bạn?" }
+      ]
+    },
+    {
+      id: "s1_3", lesson: 1, part: 2, scene: "tea",
+      tag: "Bài 1 (P.2) • Sở thích đồ uống Đài Loan",
+      zh: "我很喜歡喝臺灣烏龍茶，也喜歡喝珍珠奶茶。",
+      py: "Wǒ hěn xǐhuān hē Táiwān wūlóngchá, yě xǐhuān hē zhēnzhū nǎichá.",
+      vi: "Tôi rất thích uống trà Ô Long Đài Loan, cũng thích uống trà sữa trân châu.",
+      hint: "Phó từ 也 (cũng) đứng trước động từ 喜歡.",
+      tiles: ["我很", "喜歡", "喝", "臺灣", "烏龍茶", "，", "也喜歡", "喝", "珍珠奶茶", "。"],
+      gloss: [
+        { w: "我很喜歡", py: "wǒ hěn xǐhuān", vi: "Tôi rất thích" },
+        { w: "喝臺灣烏龍茶，", py: "hē Táiwān wūlóngchá,", vi: "uống trà Ô Long Đài Loan," },
+        { w: "也喜歡喝", py: "yě xǐhuān hē", vi: "cũng thích uống" },
+        { w: "珍珠奶茶。", py: "zhēnzhū nǎichá.", vi: "trà sữa trân châu." }
+      ]
+    },
+    {
+      id: "s2_1", lesson: 2, part: 1, scene: "family",
+      tag: "Bài 2 (P.1) • Giới thiệu ảnh gia đình & Lượng từ",
+      zh: "這張照片很漂亮，我家有五個人。",
+      py: "Zhè zhāng zhàopiàn hěn piàoliang, wǒ jiā yǒu wǔ ge rén.",
+      vi: "Bức ảnh này rất đẹp, gia đình tôi có năm người.",
+      hint: "Lượng từ của 照片 là 張; lượng từ của 人 là 個.",
+      tiles: ["這張", "照片", "很漂亮", "，", "我家", "有", "五個人", "。"],
+      gloss: [
+        { w: "這張照片", py: "zhè zhāng zhàopiàn", vi: "Bức ảnh này" },
+        { w: "很漂亮，", py: "hěn piàoliang,", vi: "rất đẹp," },
+        { w: "我家有", py: "wǒ jiā yǒu", vi: "gia đình tôi có" },
+        { w: "五個人。", py: "wǔ ge rén.", vi: "năm người." }
+      ]
+    },
+    {
+      id: "s2_2", lesson: 2, part: 2, scene: "family",
+      tag: "Bài 2 (P.2) • Nghề nghiệp gia đình & Phó từ 都",
+      zh: "我爸爸是醫生，媽媽是老師，我們都是大學生。",
+      py: "Wǒ bàba shì yīshēng, māma shì lǎoshī, wǒmen dōu shì dàxuéshēng.",
+      vi: "Bố tôi là bác sĩ, mẹ là giáo viên, chúng tôi đều là sinh viên đại học.",
+      hint: "Phó từ 都 đứng sau 我們 và trước động từ 是.",
+      tiles: ["我爸爸", "是醫生", "，", "媽媽", "是老師", "，", "我們", "都是", "大學生", "。"],
+      gloss: [
+        { w: "我爸爸是醫生，", py: "wǒ bàba shì yīshēng,", vi: "Bố tôi là bác sĩ," },
+        { w: "媽媽是老師，", py: "māma shì lǎoshī,", vi: "mẹ là giáo viên," },
+        { w: "我們都是", py: "wǒmen dōu shì", vi: "chúng tôi đều là" },
+        { w: "大學生。", py: "dàxuéshēng.", vi: "sinh viên đại học." }
+      ]
+    },
+    {
+      id: "s3_1", lesson: 3, part: 1, scene: "weekend",
+      tag: "Bài 3 (P.1) • Hoạt động cuối tuần & Thể thao",
+      zh: "我週末常跟朋友去打網球，也常去看電影。",
+      py: "Wǒ zhōumò cháng gēn péngyou qù dǎ wǎngqiú, yě cháng qù kàn diànyǐng.",
+      vi: "Cuối tuần tôi thường đi đánh quần vợt với bạn, cũng thường đi xem phim.",
+      hint: "Trật tự: Chủ ngữ + 週末 + 常 + 跟朋友 + 去 + Động từ.",
+      tiles: ["我", "週末", "常跟", "朋友", "去", "打網球", "，", "也常去", "看電影", "。"],
+      gloss: [
+        { w: "我週末", py: "wǒ zhōumò", vi: "Cuối tuần tôi" },
+        { w: "常跟朋友", py: "cháng gēn péngyou", vi: "thường cùng bạn bè" },
+        { w: "去打網球，", py: "qù dǎ wǎngqiú,", vi: "đi đánh quần vợt," },
+        { w: "也常去看電影。", py: "yě cháng qù kàn diànyǐng.", vi: "cũng thường đi xem phim." }
+      ]
+    },
+    {
+      id: "s3_2", lesson: 3, part: 2, scene: "weekend",
+      tag: "Bài 3 (P.2) • Mời ăn món Đài Loan (請客 / 吧)",
+      zh: "今天晚上我請客，我們一起去吃臺灣菜吧！",
+      py: "Jīntiān wǎnshàng wǒ qǐngkè, wǒmen yìqǐ qù chī Táiwāncài ba!",
+      vi: "Tối hôm nay tôi mời khách, chúng ta cùng đi ăn món Đài Loan nhé!",
+      hint: "Cấu trúc rủ rê: 我們一起去 + Động từ + 吧！",
+      tiles: ["今天", "晚上", "我請客", "，", "我們", "一起去", "吃", "臺灣菜", "吧！"],
+      gloss: [
+        { w: "今天晚上", py: "jīntiān wǎnshàng", vi: "Tối hôm nay" },
+        { w: "我請客，", py: "wǒ qǐngkè,", vi: "tôi đãi khách," },
+        { w: "我們一起去", py: "wǒmen yìqǐ qù", vi: "chúng mình cùng đi" },
+        { w: "吃臺灣菜吧！", py: "chī Táiwāncài ba!", vi: "ăn món Đài Loan nhé!" }
+      ]
+    },
+    {
+      id: "s4_1", lesson: 4, part: 1, scene: "seasons",
+      tag: "Bài 4 (P.1) • Thời tiết & So sánh 沒有...那麼...",
+      zh: "那裡的夏天非常熱，我覺得沒有春天那麼舒服。",
+      py: "Nàlǐ de xiàtiān fēicháng rè, wǒ juéde méiyǒu chūntiān nàme shūfu.",
+      vi: "Mùa hè ở đó vô cùng nóng, tôi cảm thấy không dễ chịu như mùa xuân.",
+      hint: "Cấu trúc: 夏天 + 沒有 + 春天 + 那麼舒服。",
+      tiles: ["那裡的", "夏天", "非常熱", "，", "我覺得", "沒有", "春天", "那麼", "舒服", "。"],
+      gloss: [
+        { w: "那裡的夏天", py: "nàlǐ de xiàtiān", vi: "Mùa hè ở đó" },
+        { w: "非常熱，", py: "fēicháng rè,", vi: "vô cùng nóng," },
+        { w: "我覺得", py: "wǒ juéde", vi: "tôi cảm thấy" },
+        { w: "沒有春天那麼舒服。", py: "méiyǒu chūntiān nàme shūfu.", vi: "không dễ chịu như mùa xuân." }
+      ]
+    },
+    {
+      id: "s4_2", lesson: 4, part: 2, scene: "seasons",
+      tag: "Bài 4 (P.2) • Hỏi giá tiền & Cảm thán 太...了",
+      zh: "請問這兩杯珍珠奶茶一共多少錢？太好喝了！",
+      py: "Qǐngwèn zhè liǎng bēi zhēnzhū nǎichá yígòng duōshǎo qián? Tài hǎohē le!",
+      vi: "Xin hỏi hai ly trà sữa trân châu này tổng cộng bao nhiêu tiền? Ngon quá đi!",
+      hint: "Số lượng 2 đi với lượng từ 杯 phải dùng 兩杯.",
+      tiles: ["請問", "這兩杯", "珍珠奶茶", "一共", "多少錢", "？", "太好喝了", "！"],
+      gloss: [
+        { w: "請問", py: "qǐngwèn", vi: "Xin hỏi" },
+        { w: "這兩杯珍珠奶茶", py: "zhè liǎng bēi zhēnzhū nǎichá", vi: "hai ly trà sữa trân châu này" },
+        { w: "一共多少錢？", py: "yígòng duōshǎo qián?", vi: "tổng cộng bao nhiêu tiền?" },
+        { w: "太好喝了！", py: "tài hǎohē le!", vi: "Ngon quá đi!" }
+      ]
+    }
+  ];
+
+  // Roleplay Dialogues for Speaking Studio
+  const ROLEPLAY_DB = [
+    {
+      lesson: 1, part: 1,
+      speaker: "陳月美 (Bạn học tại Đài Bắc)",
+      questionZh: "你好！請問你貴姓？你叫什麼名字？",
+      questionPy: "Nǐ hǎo! Qǐngwèn nǐ guìxìng? Nǐ jiào shénme míngzi?",
+      questionVi: "Xin chào! Xin hỏi bạn họ gì? Bạn tên là gì?",
+      zh: "你好，我姓陳，我叫陳月美。",
+      py: "Nǐ hǎo, wǒ xìng Chén, wǒ jiào Chén Yuèměi.",
+      vi: "Xin chào, tôi họ Trần, tôi tên là Trần Nguyệt Mỹ.",
+      tip: "Hai thanh 3 đi liền nhau trong 『你好』 đọc biến điệu thành Ní hǎo. Chữ 『姓』 và 『叫』 nhấn dứt khoát thanh 4."
+    },
+    {
+      lesson: 1, part: 2,
+      speaker: "李東健 (Quán trà Đài Bắc)",
+      questionZh: "請問你是哪國人？你喜歡喝什麼茶？",
+      questionPy: "Qǐngwèn nǐ shì nǎ guó rén? Nǐ xǐhuān hē shénme chá?",
+      questionVi: "Xin hỏi bạn là người nước nào? Bạn thích uống trà gì?",
+      zh: "我是越南人，我很喜歡喝臺灣烏龍茶。",
+      py: "Wǒ shì Yuènánrén, wǒ hěn xǐhuān hē Táiwān wūlóngchá.",
+      vi: "Tôi là người Việt Nam, tôi rất thích uống trà Ô Long Đài Loan.",
+      tip: "Chữ 『茶』(chá) là âm cong lưỡi bật hơi nhẹ (ch-), kéo lên thanh 2."
+    },
+    {
+      lesson: 2, part: 1,
+      speaker: "王開文 (Xem ảnh gia đình)",
+      questionZh: "這張照片很漂亮！請問你家有幾個人？",
+      questionPy: "Zhè zhāng zhàopiàn hěn piàoliang! Qǐngwèn nǐ jiā yǒu jǐ ge rén?",
+      questionVi: "Bức ảnh này đẹp quá! Xin hỏi nhà bạn có mấy người?",
+      zh: "謝謝！我家有五個人，我有一個哥哥。",
+      py: "Xièxie! Wǒ jiā yǒu wǔ ge rén, wǒ yǒu yí ge gēge.",
+      vi: "Cảm ơn! Nhà tôi có 5 người, tôi có một người anh trai.",
+      tip: "Chữ 『一』 đứng trước thanh 4 (個) biến điệu thành thanh 2 (yí ge)."
+    },
+    {
+      lesson: 3, part: 1,
+      speaker: "馬安同 (Lên lịch cuối tuần)",
+      questionZh: "這個週末你常做什麼運動？",
+      questionPy: "Zhège zhōumò nǐ cháng zuò shénme yùndòng?",
+      questionVi: "Cuối tuần này bạn thường chơi môn thể thao gì?",
+      zh: "我週末常跟朋友去打網球和看電影。",
+      py: "Wǒ zhōumò cháng gēn péngyou qù dǎ wǎngqiú hé kàn diànyǐng.",
+      vi: "Cuối tuần tôi thường đi đánh quần vợt và xem phim với bạn.",
+      tip: "Hai thanh 3 trong 『打網球』(dǎ wǎngqiú) biến điệu chữ đầu thành dá wǎngqiú."
+    },
+    {
+      lesson: 4, part: 1,
+      speaker: "張怡君 (Trò chuyện về thời tiết)",
+      questionZh: "你覺得臺灣夏天的天氣怎麼樣？",
+      questionPy: "Nǐ juéde Táiwān xiàtiān de tiānqì zěnmeyàng?",
+      questionVi: "Bạn cảm thấy thời tiết mùa hè ở Đài Loan thế nào?",
+      zh: "臺灣的夏天非常熱，我覺得春天很舒服。",
+      py: "Táiwān de xiàtiān fēicháng rè, wǒ juéde chūntiān hěn shūfu.",
+      vi: "Mùa hè ở Đài Loan rất nóng, tôi thấy mùa xuân rất dễ chịu.",
+      tip: "Chữ 『熱』(rè) là âm cong lưỡi r- thanh 4; 『舒服』(shūfu) âm sau đọc thanh nhẹ."
+    }
+  ];
+
+  // Grammar Error-Correction Exercises (Step 4 Test)
+  const DETECTIVE_DB = [
+    {
+      lesson: 1, part: 1,
+      wrongZh: "請問您貴姓？我貴姓王。",
+      correctZh: "請問您貴姓？我姓王。",
+      py: "Qǐngwèn nín guìxìng? Wǒ xìng Wáng.",
+      options: [
+        "Sai ở 『我貴姓王』 — trả lời họ của mình chỉ nói 『我姓王』, không dùng 貴姓 cho bản thân.",
+        "Sai ở 『請問』 — không được đứng đầu câu.",
+        "Sai ở 『您』 — phải đổi thành 們."
+      ],
+      correctIdx: 0
+    },
+    {
+      lesson: 1, part: 2,
+      wrongZh: "請問你喜歡喝什麼嗎？",
+      correctZh: "請問你喜歡喝什麼？",
+      py: "Qǐngwèn nǐ xǐhuān hē shénme?",
+      options: [
+        "Thừa trợ từ 『嗎』 — câu đã có từ để hỏi 『什麼』 thì không dùng 『嗎』 ở cuối câu.",
+        "Sai vị trí chữ 『喝』 — phải đặt sau 『什麼』.",
+        "Thiếu chữ 『很』 trước 『喜歡』."
+      ],
+      correctIdx: 0
+    },
+    {
+      lesson: 2, part: 1,
+      wrongZh: "我有二張家人的照片。",
+      correctZh: "我有兩張家人的照片。",
+      py: "Wǒ yǒu liǎng zhāng jiārén de zhàopiàn.",
+      options: [
+        "Sai số từ 『二張』 — trước lượng từ (張、個) số 2 bắt buộc dùng 『兩張』.",
+        "Sai lượng từ 『張』 — ảnh phải dùng lượng từ 『本』.",
+        "Sai động từ 『有』 — phải dùng 『是』."
+      ],
+      correctIdx: 0
+    },
+    {
+      lesson: 2, part: 2,
+      wrongZh: "我不有哥哥，都我們是大學生。",
+      correctZh: "我沒有哥哥，我們都是大學生。",
+      py: "Wǒ méiyǒu gēge, wǒmen dōu shì dàxuéshēng.",
+      options: [
+        "Phủ định của 『有』 là 『沒有』 (không dùng 不有) và phó từ 『都』 phải đứng sau chủ ngữ 『我們』.",
+        "Chữ 『大學生』 không đi với động từ 『是』.",
+        "Phải đặt 『哥哥』 lên đầu câu."
+      ],
+      correctIdx: 0
+    },
+    {
+      lesson: 3, part: 1,
+      wrongZh: "我常去打網球跟朋友週末。",
+      correctZh: "我週末常跟朋友去打網球。",
+      py: "Wǒ zhōumò cháng gēn péngyou qù dǎ wǎngqiú.",
+      options: [
+        "Sai trật tự câu — trạng ngữ thời gian 『週末』 và 『跟朋友』 phải đứng TRƯỚC động từ 『去打網球』.",
+        "Quần vợt phải dùng động từ 『踢』 thay vì 『打』.",
+        "Chữ 『常』 phải đặt ở cuối câu."
+      ],
+      correctIdx: 0
+    },
+    {
+      lesson: 4, part: 1,
+      wrongZh: "夏天不有春天那麼舒服。",
+      correctZh: "夏天沒有春天那麼舒服。",
+      py: "Xiàtiān méiyǒu chūntiān nàme shūfu.",
+      options: [
+        "Cấu trúc so sánh kém hơn phải dùng 『A 沒有 B 那麼 + Tính từ』, không dùng 『不有』.",
+        "Chữ 『舒服』 phải đứng trước 『春天』.",
+        "Thiếu chữ 『嗎』 ở cuối câu."
+      ],
+      correctIdx: 0
+    }
+  ];
+
+  // Simplified -> Traditional codepoint map (using Unicode escapes so source stays 100% Traditional)
+  const SC_TO_TC_MAP = {
+    "\u4eec": "們", "\u8bf7": "請", "\u95ee": "問", "\u8d35": "貴", "\u4ec0": "什", "\u4e48": "麼",
+    "\u5417": "嗎", "\u56fd": "國", "\u6765": "來", "\u5bf9": "對", "\u6ca1": "沒", "\u5173": "關",
+    "\u7cfb": "係", "\u8c22": "謝", "\u559c": "喜", "\u6b22": "歡", "\u53f0": "臺", "\u6e7e": "灣",
+    "\u5f20": "張", "\u4e24": "兩", "\u4e2a": "個", "\u8fd9": "這", "\u8c01": "誰", "\u5e08": "師",
+    "\u533b": "醫", "\u5b66": "學", "\u4e60": "習", "\u6f02": "漂", "\u5468": "週", "\u7f51": "網",
+    "\u7535": "電", "\u89c6": "視", "\u5f71": "影", "\u542c": "聽", "\u4e50": "樂", "\u4e66": "書",
+    "\u8fd0": "運", "\u52a8": "動", "\u65f6": "時", "\u8fd8": "還", "\u996d": "飯", "\u70b9": "點",
+    "\u89c9": "覺", "\u70ed": "熱", "\u98ce": "風", "\u51ac": "冬", "\u6c14": "氣", "\u8bf4": "說",
+    "\u8bdd": "話", "\u6c49": "漢", "\u8bed": "語", "\u53f7": "號", "\u7801": "碼", "\u94b1": "錢",
+    "\u5988": "媽", "\u59d0": "姐", "\u7238": "爸", "\u7bee": "籃", "\u4e4c": "烏", "\u9f99": "龍"
+  };
+
+  function toTraditional(str) {
+    if (!str) return "";
+    let out = "";
+    for (const ch of str) {
+      out += SC_TO_TC_MAP[ch] || ch;
+    }
+    return out;
+  }
+
+  // Character-level Pinyin dictionary for pronunciation coaching
+  const CHAR_PINYIN_MAP = {
+    "你": "nǐ", "好": "hǎo", "請": "qǐng", "問": "wèn", "貴": "guì", "姓": "xìng", "叫": "jiào",
+    "什": "shén", "麼": "me", "名": "míng", "字": "zì", "我": "wǒ", "是": "shì", "越": "Yuè",
+    "南": "nán", "人": "rén", "臺": "Tái", "灣": "wān", "中": "Zhōng", "文": "wén", "華": "Huá",
+    "李": "Lǐ", "陳": "Chén", "月": "Yuè", "美": "měi", "王": "Wáng", "開": "Kāi", "東": "Dōng",
+    "健": "Jiàn", "馬": "Mǎ", "安": "Ān", "同": "Tóng", "明": "Míng", "很": "hěn", "喜": "xǐ",
+    "歡": "huān", "喝": "hē", "茶": "chá", "咖": "kā", "啡": "fēi", "烏": "wū", "龍": "lóng",
+    "珍": "zhēn", "珠": "zhū", "奶": "nǎi", "嗎": "ma", "呢": "ne", "不": "bù", "也": "yě",
+    "都": "dōu", "這": "zhè", "那": "nà", "張": "zhāng", "照": "zhào", "片": "piàn", "有": "yǒu",
+    "沒": "méi", "兩": "liǎng", "個": "ge", "五": "wǔ", "家": "jiā", "爸": "bà", "媽": "mā",
+    "哥": "gē", "姐": "jiě", "妹": "mèi", "弟": "dì", "老": "lǎo", "師": "shī", "醫": "yī",
+    "生": "shēng", "大": "dà", "學": "xué", "漂": "piào", "亮": "liàng", "謝": "xiè", "和": "hé",
+    "週": "zhōu", "末": "mò", "常": "cháng", "跟": "gēn", "朋": "péng", "友": "you", "去": "qù",
+    "打": "dǎ", "網": "wǎng", "球": "qiú", "籃": "lán", "看": "kàn", "電": "diàn", "影": "yǐng",
+    "視": "shì", "聽": "tīng", "音": "yīn", "樂": "yuè", "書": "shū", "運": "yùn", "動": "dòng",
+    "時": "shí", "候": "hou", "吃": "chī", "菜": "cài", "飯": "fàn", "今": "jīn", "天": "tiān",
+    "晚": "wǎn", "上": "shàng", "客": "kè", "一": "yì", "起": "qǐ", "吧": "ba", "太": "tài",
+    "了": "le", "裡": "lǐ", "的": "de", "夏": "xià", "春": "chūn", "秋": "qiū", "冬": "dōng",
+    "非": "fēi", "熱": "rè", "冷": "lěng", "覺": "jué", "得": "de", "舒": "shū", "服": "fu",
+    "氣": "qì", "杯": "bēi", "共": "gòng", "多": "duō", "少": "shǎo", "錢": "qián", "您": "nín",
+    "日": "Rì", "本": "běn", "哪": "nǎ", "國": "guó", "迎": "yíng", "來": "lái"
+  };
+
+  const HOMOPHONE_GROUPS = [
+    ["姓", "性", "興", "信", "星", "心"],
+    ["陳", "成", "程", "城", "乘"],
+    ["張", "章", "長", "常"],
+    ["兩", "想", "講"],
+    ["照", "叫", "教", "覺"],
+    ["片", "騙", "遍", "便"],
+    ["網", "往", "忘", "望", "王"],
+    ["球", "求", "秋"],
+    ["週", "州", "洲", "粥"],
+    ["末", "莫", "墨", "默"],
+    ["常", "長", "場", "嚐"],
+    ["請", "情", "晴", "親", "清"],
+    ["客", "課", "刻", "克"],
+    ["越", "月", "樂", "悅"],
+    ["熱", "樂", "了", "惹"],
+    ["是", "事", "市", "試", "視", "室", "師", "十", "四"],
+    ["和", "合", "河", "何", "喝"],
+    ["在", "再", "載"],
+    ["她", "他", "它"],
+    ["你", "妳", "里", "理", "李"],
+    ["嗎", "媽", "馬", "罵"],
+    ["呢", "泥", "你"],
+    ["喜", "洗", "起"],
+    ["歡", "換", "還", "環"]
+  ];
+
+  return {
+    LESSONS_META,
+    SCENE_SVGS,
+    VOCAB_DB,
+    GRAMMAR_DB,
+    SENTENCES_DB,
+    ROLEPLAY_DB,
+    DETECTIVE_DB,
+    CHAR_PINYIN_MAP,
+    HOMOPHONE_GROUPS,
+    toTraditional
+  };
+})();
+
+
+/**
+ * ============================================================================
+ * MODULE 2: SCOPE FILTER & PROGRESS STORE
+ * Manages active lessons (1..4), half-lesson parts, individual words, and stats
+ * ============================================================================
+ */
+window.AppStore = (function () {
+  "use strict";
+
+  const STORAGE_KEY = "tocfl_dangdai1_clean_state_v2";
+  const DB = window.CurriculumDB;
+
+  const state = {
+    activeLessons: [1, 2, 3, 4],
+    activePart: "ALL", // "ALL" | 1 | 2
+    disabledWordIds: new Set(),
+    voiceGender: "female", // "female" | "male" | "duet"
+    voiceRate: 1.0,
+    comebackDismissed: false,
+    comebackBroken: false,
+    comebackTasks: [
+      { id: "t1", label: "Nghe & lật 2 thẻ từ vựng Phồn thể ở Bước 1", done: false },
+      { id: "t2", label: "Hoàn thành 1 câu ghép hoặc dịch ở Bước 2", done: false },
+      { id: "t3", label: "Thu âm & chấm phát âm 1 câu ở Bước 3", done: false }
+    ],
+    stats: {
+      vocabReviewed: 0,
+      sentencesDone: 0,
+      speakScores: [],
+      quizRight: 0,
+      quizTotal: 0,
+      focusSeconds: 15 * 60,
+      focusRunning: false
+    }
+  };
+
+  function load() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed.activeLessons) && parsed.activeLessons.length) {
+        state.activeLessons = parsed.activeLessons;
+      }
+      if (parsed.activePart) state.activePart = parsed.activePart;
+      if (Array.isArray(parsed.disabledWordIds)) {
+        state.disabledWordIds = new Set(parsed.disabledWordIds);
+      }
+      if (parsed.voiceGender) state.voiceGender = parsed.voiceGender;
+      if (typeof parsed.voiceRate === "number") state.voiceRate = parsed.voiceRate;
+    } catch (e) {}
+  }
+
+  function save() {
+    try {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          activeLessons: state.activeLessons,
+          activePart: state.activePart,
+          disabledWordIds: Array.from(state.disabledWordIds),
+          voiceGender: state.voiceGender,
+          voiceRate: state.voiceRate
+        })
+      );
+    } catch (e) {}
+  }
+
+  function getVocab() {
+    const filtered = DB.VOCAB_DB.filter(
+      (v) =>
+        state.activeLessons.includes(v.lesson) &&
+        (state.activePart === "ALL" || v.part === state.activePart) &&
+        !state.disabledWordIds.has(v.id)
+    );
+    if (filtered.length > 0) return filtered;
+    const byLesson = DB.VOCAB_DB.filter((v) => state.activeLessons.includes(v.lesson));
+    return byLesson.length > 0 ? byLesson : DB.VOCAB_DB;
+  }
+
+  function getGrammar() {
+    const filtered = DB.GRAMMAR_DB.filter(
+      (g) =>
+        state.activeLessons.includes(g.lesson) &&
+        (state.activePart === "ALL" || g.part === state.activePart)
+    );
+    return filtered.length > 0 ? filtered : DB.GRAMMAR_DB;
+  }
+
+  function getSentences() {
+    const filtered = DB.SENTENCES_DB.filter(
+      (s) =>
+        state.activeLessons.includes(s.lesson) &&
+        (state.activePart === "ALL" || s.part === state.activePart)
+    );
+    return filtered.length > 0 ? filtered : DB.SENTENCES_DB;
+  }
+
+  function getRoleplay() {
+    const filtered = DB.ROLEPLAY_DB.filter(
+      (r) =>
+        state.activeLessons.includes(r.lesson) &&
+        (state.activePart === "ALL" || r.part === state.activePart)
+    );
+    return filtered.length > 0 ? filtered : DB.ROLEPLAY_DB;
+  }
+
+  function getDetective() {
+    const filtered = DB.DETECTIVE_DB.filter(
+      (d) =>
+        state.activeLessons.includes(d.lesson) &&
+        (state.activePart === "ALL" || d.part === state.activePart)
+    );
+    return filtered.length > 0 ? filtered : DB.DETECTIVE_DB;
+  }
+
+  function toggleLesson(lessonId) {
+    const idx = state.activeLessons.indexOf(lessonId);
+    if (idx >= 0) {
+      if (state.activeLessons.length === 1) return false; // Must keep at least 1 lesson
+      state.activeLessons.splice(idx, 1);
+    } else {
+      state.activeLessons.push(lessonId);
+      state.activeLessons.sort((a, b) => a - b);
+    }
+    save();
+    return true;
+  }
+
+  function setOnlyLesson(lessonId) {
+    state.activeLessons = [lessonId];
+    state.activePart = "ALL";
+    save();
+  }
+
+  function setAllLessons() {
+    state.activeLessons = [1, 2, 3, 4];
+    state.activePart = "ALL";
+    state.disabledWordIds.clear();
+    save();
+  }
+
+  function setPartFilter(part) {
+    state.activePart = part;
+    save();
+  }
+
+  function toggleWordId(wordId) {
+    if (state.disabledWordIds.has(wordId)) {
+      state.disabledWordIds.delete(wordId);
+    } else {
+      state.disabledWordIds.add(wordId);
+    }
+    save();
+  }
+
+  function setAllWordsInScope(enabled) {
+    const inScope = DB.VOCAB_DB.filter(
+      (v) =>
+        state.activeLessons.includes(v.lesson) &&
+        (state.activePart === "ALL" || v.part === state.activePart)
+    );
+    inScope.forEach((v) => {
+      if (enabled) state.disabledWordIds.delete(v.id);
+      else state.disabledWordIds.add(v.id);
+    });
+    if (!enabled && inScope.length > 0) {
+      // Keep at least 2 words enabled
+      state.disabledWordIds.delete(inScope[0].id);
+      if (inScope[1]) state.disabledWordIds.delete(inScope[1].id);
+    }
+    save();
+  }
+
+  function completeComebackTask(taskId) {
+    const t = state.comebackTasks.find((x) => x.id === taskId);
+    if (t && !t.done) {
+      t.done = true;
+      if (state.comebackTasks.every((x) => x.done)) {
+        state.comebackBroken = true;
+      }
+    }
+  }
+
+  function getScopeSummaryText() {
+    const lText =
+      state.activeLessons.length === 4
+        ? "Bài 1–4"
+        : "Bài " + state.activeLessons.join(", ");
+    const pText =
+      state.activePart === "ALL"
+        ? ""
+        : state.activePart === 1
+        ? " • Nửa đầu"
+        : " • Nửa sau";
+    return `${lText}${pText} (${getVocab().length} từ)`;
+  }
+
+  load();
+
+  return {
+    state,
+    save,
+    getVocab,
+    getGrammar,
+    getSentences,
+    getRoleplay,
+    getDetective,
+    toggleLesson,
+    setOnlyLesson,
+    setAllLessons,
+    setPartFilter,
+    toggleWordId,
+    setAllWordsInScope,
+    completeComebackTask,
+    getScopeSummaryText
+  };
+})();
+
+
+/**
+ * ============================================================================
+ * MODULE 3: TAIWANESE MANDARIN VOICE ENGINE (zh-TW)
+ * Supports Female (雅婷), Male (雲哲), and Duet (Song thanh) + Audio Chimes
+ * ============================================================================
+ */
+window.VoiceService = (function () {
+  "use strict";
+
+  const Store = window.AppStore;
+  let cachedVoices = [];
+
+  function refreshVoices() {
+    try {
+      if (window.speechSynthesis) {
+        cachedVoices = window.speechSynthesis.getVoices() || [];
+      }
+    } catch (e) {}
+  }
+
+  if (typeof window !== "undefined" && window.speechSynthesis) {
+    refreshVoices();
+    window.speechSynthesis.onvoiceschanged = refreshVoices;
+  }
+
+  function pickVoice(gender) {
+    if (!cachedVoices.length) refreshVoices();
+    const zhVoices = cachedVoices.filter((v) => /zh|cmn|chinese/i.test(v.lang + " " + v.name));
+    const twVoices = zhVoices.filter((v) => /TW|Taiwan|Hant/i.test(v.lang + " " + v.name));
+    const pool = twVoices.length ? twVoices : zhVoices;
+    if (!pool.length) return null;
+
+    if (gender === "male") {
+      return (
+        pool.find((v) => /YunJhe|Kangkang|Male|Danny|Zhiwei|雲哲/i.test(v.name)) ||
+        pool[pool.length - 1]
+      );
+    }
+    return (
+      pool.find((v) => /Yating|HsiaoChen|Meijia|Hanhan|Female|雅婷|曉臻/i.test(v.name)) ||
+      pool[0]
+    );
+  }
+
+  function speakSingle(text, gender, rateOverride, onDone) {
+    if (!text || !window.speechSynthesis) {
+      if (onDone) onDone();
+      return;
+    }
+    try {
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = "zh-TW";
+      const v = pickVoice(gender);
+      if (v) u.voice = v;
+      u.rate = rateOverride || Store.state.voiceRate || 1.0;
+      u.pitch = gender === "male" ? 0.84 : 1.08;
+      if (onDone) {
+        u.onend = onDone;
+        u.onerror = onDone;
+      }
+      window.speechSynthesis.speak(u);
+    } catch (e) {
+      if (onDone) onDone();
+    }
+  }
+
+  function speak(text, modeOverride, rateOverride) {
+    if (!text || !window.speechSynthesis) return;
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
+
+    const mode = modeOverride || Store.state.voiceGender || "female";
+    if (mode === "duet") {
+      speakSingle(text, "female", rateOverride, () => {
+        setTimeout(() => speakSingle(text, "male", rateOverride), 220);
+      });
+    } else {
+      speakSingle(text, mode, rateOverride);
+    }
+  }
+
+  function playEffect(type) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const now = ctx.currentTime;
+
+      if (type === "win") {
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(523.25, now);
+        osc.frequency.setValueAtTime(659.25, now + 0.08);
+        osc.frequency.setValueAtTime(783.99, now + 0.16);
+        gain.gain.setValueAtTime(0.08, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+        osc.start(now);
+        osc.stop(now + 0.36);
+      } else if (type === "wrong") {
+        osc.type = "sawtooth";
+        osc.frequency.setValueAtTime(220, now);
+        osc.frequency.setValueAtTime(175, now + 0.12);
+        gain.gain.setValueAtTime(0.06, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+        osc.start(now);
+        osc.stop(now + 0.28);
+      } else {
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(600, now);
+        gain.gain.setValueAtTime(0.04, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        osc.start(now);
+        osc.stop(now + 0.08);
+      }
+      setTimeout(() => {
+        try { ctx.close(); } catch (e) {}
+      }, 450);
+    } catch (e) {}
+  }
+
+  return {
+    speak,
+    playEffect
+  };
+})();
+
+
+/**
+ * ============================================================================
+ * MODULE 4: SPEECH RECOGNITION & PRONUNCIATION GRADING ENGINE (zh-TW)
+ * Real Web Speech API + MediaRecorder Playback + Character/Tone Evaluator
+ * ============================================================================
+ */
+window.SpeechService = (function () {
+  "use strict";
+
+  const DB = window.CurriculumDB;
+  const PUBLIC_HTTPS_URL = "https://hunghp2002.github.io/hoc-tieng-trung-phon-the/";
+  const IS_MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || "");
+
+  let recognizer = null;
+  let isRecording = false;
+  let sessionDone = true;
+  let stopMode = "";
+  let fatalError = false;
+  let lastErrorMsg = "";
+  let finalText = "";
+  let interimText = "";
+  let startMs = 0;
+  let maxDurMs = 12000;
+  let countdownTimer = null;
+  let silenceTimer = null;
+
+  // Audio playback & level meter
+  let micStream = null;
+  let mediaRecorder = null;
+  let audioChunks = [];
+  let recordedUrl = null;
+  let audioCtx = null;
+  let levelTimer = null;
+
+  const ERROR_MESSAGES = {
+    "not-allowed":
+      "Trình duyệt hoặc khung xem trước đang chặn quyền Micro. Hãy bấm nút 'Mở ở tab riêng (HTTPS)' để cấp quyền Micro trực tiếp, hoặc bấm phím 🎤 Micro trên bàn phím (Win+H / bàn phím điện thoại) để nói vào ô chữ Hán.",
+    "service-not-allowed":
+      "Dịch vụ nhận diện giọng nói bị chặn trong khung nhúng. Hãy mở ứng dụng ở tab riêng (HTTPS) bằng Chrome, Edge hoặc Safari.",
+    "no-speech":
+      "Chưa nghe thấy giọng nói. Hãy đặt micro gần hơn và đọc to, rõ từng chữ Hán.",
+    "audio-capture":
+      "Không tìm thấy thiết bị Micro hoặc Micro đang bị ứng dụng khác sử dụng.",
+    "network":
+      "Lỗi kết nối mạng khi gọi dịch vụ nhận diện giọng nói zh-TW.",
+    "language-not-supported":
+      "Trình duyệt chưa hỗ trợ gói nhận diện tiếng Trung (zh-TW). Hãy dùng Chrome, Edge hoặc Safari.",
+    "unsupported":
+      "Trình duyệt này chưa hỗ trợ Web Speech API (ví dụ Firefox). Hãy mở bằng Chrome/Edge/Safari hoặc dùng phím 🎤 Micro của bàn phím để nói vào ô bên dưới."
+  };
+
+  function isEmbedded() {
+    try {
+      return window.self !== window.top;
+    } catch (e) {
+      return true;
+    }
+  }
+
+  function onPublicSite() {
+    try {
+      return location.href.indexOf("hunghp2002.github.io") >= 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function cleanHanzi(str) {
+    return DB.toTraditional(str || "").replace(
+      /[，。？！、；：「」『』（）()\s,.?!;:"'—…\-]/g,
+      ""
+    );
+  }
+
+  function stripTone(py) {
+    if (!py) return "";
+    return py
+      .toLowerCase()
+      .replace(/[āáǎà]/g, "a")
+      .replace(/[ēéěè]/g, "e")
+      .replace(/[īíǐì]/g, "i")
+      .replace(/[ōóǒò]/g, "o")
+      .replace(/[ūúǔù]/g, "u")
+      .replace(/[ǖǘǚǜü]/g, "v")
+      .replace(/[^a-zv]/g, "");
+  }
+
+  function areCharsNearSound(tChar, sChar) {
+    if (!tChar || !sChar) return false;
+    if (tChar === sChar) return true;
+    for (const grp of DB.HOMOPHONE_GROUPS) {
+      if (grp.includes(tChar) && grp.includes(sChar)) return true;
+    }
+    const py1 = stripTone(DB.CHAR_PINYIN_MAP[tChar] || "");
+    const py2 = stripTone(DB.CHAR_PINYIN_MAP[sChar] || "");
+    if (py1 && py2) {
+      if (py1 === py2) return true;
+      const n1 = py1.replace(/^zh/, "z").replace(/^ch/, "c").replace(/^sh/, "s").replace(/^r/, "l").replace(/^n/, "l").replace(/ng$/, "n");
+      const n2 = py2.replace(/^zh/, "z").replace(/^ch/, "c").replace(/^sh/, "s").replace(/^r/, "l").replace(/^n/, "l").replace(/ng$/, "n");
+      if (n1 === n2) return true;
+    }
+    return false;
+  }
+
+  function similarityToTarget(text, targetChars) {
+    const s = Array.from(cleanHanzi(text));
+    let hit = 0;
+    const used = new Set();
+    targetChars.forEach((ch) => {
+      const idx = s.findIndex((c, k) => !used.has(k) && c === ch);
+      if (idx >= 0) {
+        used.add(idx);
+        hit++;
+      }
+    });
+    return hit - Math.max(0, s.length - targetChars.length) * 0.3;
+  }
+
+  function gradeSpeech(targetZh, spokenRaw, overrides = {}) {
+    const spokenTrad = DB.toTraditional((spokenRaw || "").trim());
+    if (!spokenTrad) return null;
+
+    const targetChars = Array.from(cleanHanzi(targetZh));
+    const spokenChars = Array.from(cleanHanzi(spokenTrad));
+    const usedSpoken = new Set();
+
+    let exactCount = 0;
+    let nearCount = 0;
+    let missingCount = 0;
+    const charResults = [];
+    const nearNotes = [];
+    const missingNotes = [];
+
+    targetChars.forEach((tChar, tIdx) => {
+      const tPy = DB.CHAR_PINYIN_MAP[tChar] || "";
+      let matchedIdx = -1;
+      let status = "missing";
+      let spokenFound = "";
+
+      for (let offset = 0; offset <= 3; offset++) {
+        for (const dir of [0, -1, 1]) {
+          const cand = tIdx + dir * offset;
+          if (cand >= 0 && cand < spokenChars.length && !usedSpoken.has(cand)) {
+            if (spokenChars[cand] === tChar) {
+              matchedIdx = cand;
+              status = "exact";
+              spokenFound = spokenChars[cand];
+              break;
+            }
+          }
+        }
+        if (matchedIdx !== -1) break;
+      }
+
+      if (matchedIdx === -1) {
+        for (let offset = 0; offset <= 2; offset++) {
+          for (const dir of [0, -1, 1]) {
+            const cand = tIdx + dir * offset;
+            if (cand >= 0 && cand < spokenChars.length && !usedSpoken.has(cand)) {
+              if (areCharsNearSound(tChar, spokenChars[cand])) {
+                matchedIdx = cand;
+                status = "near";
+                spokenFound = spokenChars[cand];
+                break;
+              }
+            }
+          }
+          if (matchedIdx !== -1) break;
+        }
+      }
+
+      if (matchedIdx !== -1) usedSpoken.add(matchedIdx);
+
+      if (overrides[tIdx]) {
+        status = overrides[tIdx];
+        if (status === "near" && (!spokenFound || spokenFound === tChar)) {
+          const grp = DB.HOMOPHONE_GROUPS.find((g) => g.includes(tChar));
+          spokenFound = grp ? grp.find((c) => c !== tChar) || tChar : "lệch thanh";
+        }
+      }
+
+      if (status === "exact") {
+        exactCount++;
+        charResults.push({ idx: tIdx, target: tChar, py: tPy, status: "exact", spoken: tChar });
+      } else if (status === "near") {
+        nearCount++;
+        const spkPy = DB.CHAR_PINYIN_MAP[spokenFound] || "lệch thanh";
+        nearNotes.push(`『${tChar}』(${tPy}) nghe thành 『${spokenFound}』(${spkPy})`);
+        charResults.push({ idx: tIdx, target: tChar, py: tPy, status: "near", spoken: spokenFound });
+      } else {
+        missingCount++;
+        missingNotes.push(`『${tChar}』(${tPy || "—"})`);
+        charResults.push({ idx: tIdx, target: tChar, py: tPy, status: "missing", spoken: "—" });
+      }
+    });
+
+    const extraChars = spokenChars.filter((_, idx) => !usedSpoken.has(idx));
+    const totalTarget = Math.max(1, targetChars.length);
+    const charScore = Math.round(((exactCount + nearCount * 0.55) / totalTarget) * 100);
+    const toneScore = Math.max(
+      0,
+      Math.min(100, Math.round(((exactCount + nearCount * 0.45) / totalTarget) * 100))
+    );
+    const penalty = Math.min(25, extraChars.length * 8 + missingCount * 10);
+    const fluencyScore = Math.max(15, Math.min(100, Math.round(100 - penalty - nearCount * 6)));
+    const totalScore = Math.max(
+      0,
+      Math.min(100, Math.round(charScore * 0.45 + toneScore * 0.35 + fluencyScore * 0.2))
+    );
+
+    return {
+      spokenTrad,
+      totalScore,
+      charScore,
+      toneScore,
+      fluencyScore,
+      exactCount,
+      nearCount,
+      missingCount,
+      totalTarget,
+      charResults,
+      extraChars,
+      nearNotes,
+      missingNotes
+    };
+  }
+
+  function releaseAudioResources() {
+    if (silenceTimer) {
+      clearTimeout(silenceTimer);
+      silenceTimer = null;
+    }
+    if (levelTimer) {
+      clearInterval(levelTimer);
+      levelTimer = null;
+    }
+    if (audioCtx) {
+      try { audioCtx.close(); } catch (e) {}
+      audioCtx = null;
+    }
+    if (mediaRecorder && mediaRecorder.state !== "inactive") {
+      try { mediaRecorder.stop(); } catch (e) {}
+    } else if (micStream) {
+      micStream.getTracks().forEach((t) => t.stop());
+    }
+    micStream = null;
+  }
+
+  function startPlaybackCapture(stream, onLevel, onAudioReady) {
+    micStream = stream;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (Ctx && onLevel) {
+        audioCtx = new Ctx();
+        const src = audioCtx.createMediaStreamSource(stream);
+        const analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 256;
+        src.connect(analyser);
+        const buf = new Uint8Array(analyser.frequencyBinCount);
+        levelTimer = setInterval(() => {
+          analyser.getByteTimeDomainData(buf);
+          let peak = 0;
+          for (let i = 0; i < buf.length; i++) {
+            peak = Math.max(peak, Math.abs(buf[i] - 128));
+          }
+          onLevel(Math.min(1, peak / 55));
+        }, 75);
+      }
+    } catch (e) {}
+
+    try {
+      audioChunks = [];
+      mediaRecorder = new MediaRecorder(stream);
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) audioChunks.push(e.data);
+      };
+      mediaRecorder.onstop = () => {
+        if (audioChunks.length > 0) {
+          const blob = new Blob(audioChunks, { type: mediaRecorder.mimeType || "audio/webm" });
+          if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+          recordedUrl = URL.createObjectURL(blob);
+          if (onAudioReady) onAudioReady(recordedUrl);
+        }
+        stream.getTracks().forEach((t) => t.stop());
+      };
+      mediaRecorder.start();
+    } catch (e) {}
+  }
+
+  function startRecording(callbacks) {
+    const { targetZh, onStateChange, onLiveUpdate, onLevel, onAudioReady, onFinish, onError } =
+      callbacks;
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRec) {
+      lastErrorMsg = ERROR_MESSAGES.unsupported;
+      if (onError) onError(lastErrorMsg, true);
+      return;
+    }
+
+    const targetChars = Array.from(cleanHanzi(targetZh));
+    finalText = "";
+    interimText = "";
+    lastErrorMsg = "";
+    fatalError = false;
+    stopMode = "";
+    sessionDone = false;
+    isRecording = true;
+    startMs = Date.now();
+    maxDurMs = Math.max(9000, Math.min(20000, targetChars.length * 1200 + 5000));
+
+    if (onStateChange) onStateChange("starting", Math.round(maxDurMs / 1000));
+
+    function finalize(shouldGrade) {
+      if (sessionDone) return;
+      sessionDone = true;
+      isRecording = false;
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+      releaseAudioResources();
+      recognizer = null;
+      const transcript = DB.toTraditional((finalText + interimText).trim());
+      if (onFinish) onFinish({ shouldGrade, transcript, error: lastErrorMsg, fatalError });
+    }
+
+    try {
+      recognizer = new SpeechRec();
+      recognizer.lang = "zh-TW";
+      recognizer.interimResults = true;
+      recognizer.maxAlternatives = 5;
+      recognizer.continuous = !IS_MOBILE;
+
+      recognizer.onstart = () => {
+        if (onStateChange) onStateChange("listening", Math.round(maxDurMs / 1000));
+        if (!IS_MOBILE && !micStream && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          navigator.mediaDevices
+            .getUserMedia({ audio: true })
+            .then((stream) => {
+              if (!isRecording) {
+                stream.getTracks().forEach((t) => t.stop());
+                return;
+              }
+              startPlaybackCapture(stream, onLevel, onAudioReady);
+            })
+            .catch(() => {});
+        }
+      };
+
+      recognizer.onresult = (event) => {
+        let finals = "";
+        let interim = "";
+        for (let i = 0; i < event.results.length; i++) {
+          const res = event.results[i];
+          let best = res[0].transcript;
+          if (res.isFinal && res.length > 1) {
+            let bestSc = -Infinity;
+            for (let a = 0; a < res.length; a++) {
+              const sc = similarityToTarget(res[a].transcript, targetChars);
+              if (sc > bestSc) {
+                bestSc = sc;
+                best = res[a].transcript;
+              }
+            }
+          }
+          if (res.isFinal) finals += best;
+          else interim += best;
+        }
+        if (finals) finalText = DB.toTraditional(finals);
+        interimText = DB.toTraditional(interim);
+        const live = DB.toTraditional((finalText + interimText).trim());
+        if (onLiveUpdate) onLiveUpdate(live);
+
+        const heard = Array.from(cleanHanzi(live));
+        if (
+          heard.length >= targetChars.length &&
+          similarityToTarget(live, targetChars) >= targetChars.length - 0.5
+        ) {
+          if (silenceTimer) clearTimeout(silenceTimer);
+          silenceTimer = setTimeout(() => stopRecording(true), 450);
+          return;
+        }
+        if (silenceTimer) clearTimeout(silenceTimer);
+        if (live.length > 0) {
+          silenceTimer = setTimeout(() => {
+            if (isRecording) stopRecording(true);
+          }, 2200);
+        }
+      };
+
+      recognizer.onerror = (event) => {
+        const code = event && event.error ? event.error : "unknown";
+        if (code === "aborted" && stopMode) return;
+        if (code === "no-speech" && !stopMode && Date.now() - startMs < maxDurMs - 1500) {
+          return;
+        }
+        lastErrorMsg = ERROR_MESSAGES[code] || `Lỗi nhận diện: ${code}`;
+        if (
+          code === "not-allowed" ||
+          code === "service-not-allowed" ||
+          code === "audio-capture" ||
+          code === "language-not-supported"
+        ) {
+          fatalError = true;
+          if (onError) onError(lastErrorMsg, true);
+        }
+      };
+
+      recognizer.onend = () => {
+        if (sessionDone) return;
+        const live = DB.toTraditional((finalText + interimText).trim());
+        const withinTime = Date.now() - startMs < maxDurMs - 1000;
+        if (isRecording && !stopMode && !fatalError && !live && withinTime) {
+          try {
+            recognizer.start();
+            return;
+          } catch (e) {}
+        }
+        finalize(stopMode !== "cancel");
+      };
+
+      recognizer.start();
+    } catch (e) {
+      fatalError = true;
+      lastErrorMsg = `Không khởi động được Micro: ${e && e.message ? e.message : e}`;
+      if (onError) onError(lastErrorMsg, true);
+      finalize(false);
+      return;
+    }
+
+    if (countdownTimer) clearInterval(countdownTimer);
+    countdownTimer = setInterval(() => {
+      if (!isRecording) return;
+      const remain = Math.max(0, Math.ceil((maxDurMs - (Date.now() - startMs)) / 1000));
+      if (onStateChange) onStateChange("tick", remain);
+      if (remain <= 0) stopRecording(true);
+    }, 300);
+  }
+
+  function stopRecording(shouldGrade = true) {
+    if (!isRecording) return;
+    stopMode = shouldGrade ? "grade" : "cancel";
+    if (silenceTimer) {
+      clearTimeout(silenceTimer);
+      silenceTimer = null;
+    }
+    if (recognizer) {
+      try {
+        if (shouldGrade) recognizer.stop();
+        else recognizer.abort();
+      } catch (e) {}
+    }
+  }
+
+  function playLastRecording() {
+    if (!recordedUrl) return;
+    const audio = new Audio(recordedUrl);
+    audio.play().catch(() => {});
+  }
+
+  return {
+    PUBLIC_HTTPS_URL,
+    isEmbedded,
+    onPublicSite,
+    cleanHanzi,
+    gradeSpeech,
+    startRecording,
+    stopRecording,
+    playLastRecording,
+    getIsRecording: () => isRecording,
+    getLastError: () => lastErrorMsg
+  };
+})();
+
+
+/**
+ * ============================================================================
+ * MODULE 5: APPLICATION UI CONTROLLER
+ * Implements the 4-Step Scientific Learning Loop (當代中文課程 1)
+ * 1. 詞彙 Từ vựng & Ngữ pháp -> 2. 造句 Đặt câu & Dịch -> 3. 口說 Luyện nói -> 4. 測驗 Kiểm tra
+ * ============================================================================
+ */
+window.App = (function () {
+  "use strict";
+
+  const DB = window.CurriculumDB;
+  const Store = window.AppStore;
+  const Voice = window.VoiceService;
+  const Speech = window.SpeechService;
+
+  const ui = {
+    currentStep: "vocab", // "vocab" | "sentence" | "speak" | "test"
+    vocabSubMode: "flashcard", // "flashcard" | "grammar"
+    vocabIdx: 0,
+
+    sentSubMode: "v2z", // "v2z" | "z2v"
+    sentIdx: 0,
+    v2zPicked: [],
+    v2zShuffled: [],
+    z2vOptions: [],
+
+    speakSubMode: "sentence", // "sentence" | "word" | "roleplay"
+    speakIdx: 0,
+    charOverrides: {},
+    dictationTimer: null,
+    waveIdleTimer: null,
+
+    testSubMode: "match", // "match" | "detective" | "quiz" | "progress"
+    matchCards: [],
+    matchFirstIdx: null,
+    matchMatched: new Set(),
+    detectiveIdx: 0,
+    quizIdx: 0,
+    quizItem: null,
+    quizOptions: [],
+
+    focusInterval: null
+  };
+
+  function el(id) {
+    return document.getElementById(id);
+  }
+
+  function shuffle(arr) {
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  // ==========================================================================
+  // Navigation & Top Bar Synchronization
+  // ==========================================================================
+  function setStep(step) {
+    Voice.playEffect("pop");
+    if (Speech.getIsRecording()) {
+      Speech.stopRecording(false);
+    }
+    ui.currentStep = step;
+    ["vocab", "sentence", "speak", "test"].forEach((s) => {
+      const tab = el("nav-step-" + s);
+      const panel = el("panel-step-" + s);
+      if (tab) tab.classList.toggle("active", s === step);
+      if (panel) panel.classList.toggle("hidden", s !== step);
+    });
+    renderCurrentStep();
+  }
+
+  function syncTopBar() {
+    const scopeBtn = el("top-scope-summary");
+    if (scopeBtn) scopeBtn.textContent = Store.getScopeSummaryText();
+
+    const voiceBtn = el("top-voice-summary");
+    if (voiceBtn) {
+      const g = Store.state.voiceGender;
+      const gLabel = g === "female" ? "👩 Nữ (雅婷)" : g === "male" ? "👨 Nam (雲哲)" : "👫 Song thanh";
+      voiceBtn.textContent = `${gLabel} • ${Store.state.voiceRate}x`;
+    }
+
+    const doneCount = Store.state.comebackTasks.filter((t) => t.done).length;
+    const comebackBtn = el("top-comeback-btn");
+    if (comebackBtn) {
+      if (Store.state.comebackBroken) {
+        comebackBtn.className = "pill-btn pill-jade";
+        comebackBtn.textContent = `✅ Đã phá băng (${doneCount}/3)`;
+      } else {
+        comebackBtn.className = "pill-btn pill-alert";
+        comebackBtn.textContent = `🔥 Nghỉ 5 ngày (${doneCount}/3)`;
+      }
+    }
+
+    const strip = el("comeback-strip");
+    if (strip) {
+      strip.classList.toggle(
+        "hidden",
+        Store.state.comebackDismissed || Store.state.comebackBroken
+      );
+    }
+  }
+
+  function cycleVoiceGender() {
+    Voice.playEffect("pop");
+    const order = ["female", "male", "duet"];
+    const next = order[(order.indexOf(Store.state.voiceGender) + 1) % order.length];
+    Store.state.voiceGender = next;
+    Store.save();
+    syncTopBar();
+    Voice.speak("你好，歡迎學繁體中文！", next);
+  }
+
+  function setVoiceOption(gender, rate) {
+    Voice.playEffect("pop");
+    if (gender) Store.state.voiceGender = gender;
+    if (rate) Store.state.voiceRate = rate;
+    Store.save();
+    syncTopBar();
+    renderScopeModal();
+  }
+
+  function toggleTheme() {
+    document.documentElement.classList.toggle("dark");
+  }
+
+  function dismissComebackStrip() {
+    Store.state.comebackDismissed = true;
+    syncTopBar();
+  }
+
+  function refreshAll() {
+    ui.vocabIdx = 0;
+    ui.sentIdx = 0;
+    ui.speakIdx = 0;
+    ui.detectiveIdx = 0;
+    syncTopBar();
+    renderCurrentStep();
+  }
+
+  function renderCurrentStep() {
+    if (ui.currentStep === "vocab") renderVocabStep();
+    else if (ui.currentStep === "sentence") renderSentenceStep();
+    else if (ui.currentStep === "speak") renderSpeakStep();
+    else if (ui.currentStep === "test") renderTestStep();
+  }
+
+  // ==========================================================================
+  // STEP 1: 詞彙 Từ vựng & Ngữ pháp
+  // ==========================================================================
+  function setVocabSubMode(mode) {
+    Voice.playEffect("pop");
+    ui.vocabSubMode = mode;
+    el("vsub-flashcard")?.classList.toggle("active", mode === "flashcard");
+    el("vsub-grammar")?.classList.toggle("active", mode === "grammar");
+    el("vocab-flashcard-view")?.classList.toggle("hidden", mode !== "flashcard");
+    el("vocab-grammar-view")?.classList.toggle("hidden", mode !== "grammar");
+    renderVocabStep();
+  }
+
+  function renderVocabStep() {
+    const list = Store.getVocab();
+    if (!list.length) return;
+    if (ui.vocabIdx >= list.length) ui.vocabIdx = 0;
+    if (ui.vocabIdx < 0) ui.vocabIdx = list.length - 1;
+    const item = list[ui.vocabIdx];
+
+    if (ui.vocabSubMode === "flashcard") {
+      if (el("vc-tag")) el("vc-tag").textContent = `Bài ${item.lesson} • Phần ${item.part} • ${item.pos}`;
+      if (el("vc-counter")) el("vc-counter").textContent = `${ui.vocabIdx + 1} / ${list.length}`;
+      if (el("vc-scene")) el("vc-scene").innerHTML = DB.SCENE_SVGS[item.scene] || DB.SCENE_SVGS.greeting;
+      if (el("vc-hanzi")) el("vc-hanzi").textContent = item.hz;
+      if (el("vc-pinyin")) el("vc-pinyin").textContent = item.py;
+      if (el("vc-meaning")) el("vc-meaning").textContent = item.vi;
+      if (el("vc-ex-zh")) el("vc-ex-zh").textContent = item.exZh;
+      if (el("vc-ex-py")) el("vc-ex-py").textContent = item.exPy;
+      if (el("vc-ex-vi")) el("vc-ex-vi").textContent = item.exVi;
+
+      const listEl = el("vc-side-list");
+      if (listEl) {
+        listEl.innerHTML = list
+          .map(
+            (w, idx) => `
+          <button onclick="App.selectVocab(${idx})" class="vocab-row ${idx === ui.vocabIdx ? "active" : ""}">
+            <div>
+              <span class="hanzi" style="font-size:18px;font-weight:800;">${w.hz}</span>
+              <span style="font-size:13px;color:var(--primary);font-weight:700;margin-left:8px;">${w.py}</span>
+              <div style="font-size:13px;color:var(--text-secondary);">${w.vi}</div>
+            </div>
+            <span class="tag">B.${w.lesson}.${w.part}</span>
+          </button>`
+          )
+          .join("");
+      }
+    } else {
+      const grammars = Store.getGrammar();
+      const gWrap = el("grammar-list-container");
+      if (gWrap) {
+        gWrap.innerHTML = grammars
+          .map(
+            (g) => `
+          <div class="card-compact" style="display:flex;flex-direction:column;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+              <span class="tag tag-primary">Bài ${g.lesson} • Phần ${g.part}</span>
+              <button onclick="VoiceService.speak('${g.exZh}')" class="btn btn-sm btn-outline">🔊 Nghe câu mẫu</button>
+            </div>
+            <h3 style="font-size:16px;font-weight:800;">${g.title}</h3>
+            <div style="padding:8px 12px;border-radius:8px;background:var(--primary-soft);color:var(--primary-text);font-weight:700;font-size:13px;">
+              📐 Công thức: ${g.formula}
+            </div>
+            <p style="font-size:13px;color:var(--text-secondary);">${g.note}</p>
+            <div style="padding-top:6px;border-top:1px solid var(--border);font-size:14px;">
+              <div class="hanzi" style="font-weight:800;font-size:17px;">${g.exZh}</div>
+              <div style="font-size:13px;color:var(--text-secondary);">${g.exVi}</div>
+            </div>
+          </div>`
+          )
+          .join("");
+      }
+    }
+  }
+
+  function selectVocab(idx) {
+    ui.vocabIdx = idx;
+    Store.state.stats.vocabReviewed++;
+    if (Store.state.stats.vocabReviewed >= 2) Store.completeComebackTask("t1");
+    syncTopBar();
+    renderVocabStep();
+    const item = Store.getVocab()[ui.vocabIdx];
+    if (item) Voice.speak(item.hz);
+  }
+
+  function stepVocab(delta) {
+    const list = Store.getVocab();
+    if (!list.length) return;
+    ui.vocabIdx = (ui.vocabIdx + delta + list.length) % list.length;
+    selectVocab(ui.vocabIdx);
+  }
+
+  function speakCurrentVocab(gender, slow) {
+    const item = Store.getVocab()[ui.vocabIdx];
+    if (!item) return;
+    Voice.speak(item.hz, gender, slow ? 0.72 : undefined);
+  }
+
+  function speakCurrentVocabExample() {
+    const item = Store.getVocab()[ui.vocabIdx];
+    if (!item) return;
+    Voice.speak(item.exZh);
+  }
+
+  function practiceSpeakCurrentVocab() {
+    ui.speakSubMode = "word";
+    ui.speakIdx = ui.vocabIdx;
+    setStep("speak");
+  }
+
+  // ==========================================================================
+  // STEP 2: 造句 Đặt câu (Việt -> Trung) & Đọc dịch (Trung -> Việt)
+  // ==========================================================================
+  function setSentenceSubMode(mode) {
+    Voice.playEffect("pop");
+    ui.sentSubMode = mode;
+    el("ssub-v2z")?.classList.toggle("active", mode === "v2z");
+    el("ssub-z2v")?.classList.toggle("active", mode === "z2v");
+    el("sent-v2z-view")?.classList.toggle("hidden", mode !== "v2z");
+    el("sent-z2v-view")?.classList.toggle("hidden", mode !== "z2v");
+    prepareSentenceQuestion();
+  }
+
+  function renderSentenceStep() {
+    el("ssub-v2z")?.classList.toggle("active", ui.sentSubMode === "v2z");
+    el("ssub-z2v")?.classList.toggle("active", ui.sentSubMode === "z2v");
+    el("sent-v2z-view")?.classList.toggle("hidden", ui.sentSubMode !== "v2z");
+    el("sent-z2v-view")?.classList.toggle("hidden", ui.sentSubMode !== "z2v");
+    prepareSentenceQuestion();
+  }
+
+  function prepareSentenceQuestion() {
+    const list = Store.getSentences();
+    if (!list.length) return;
+    if (ui.sentIdx >= list.length) ui.sentIdx = 0;
+    if (ui.sentIdx < 0) ui.sentIdx = list.length - 1;
+    const item = list[ui.sentIdx];
+
+    if (el("sent-tag")) el("sent-tag").textContent = item.tag;
+    if (el("sent-counter")) el("sent-counter").textContent = `Câu ${ui.sentIdx + 1} / ${list.length}`;
+
+    if (ui.sentSubMode === "v2z") {
+      if (el("v2z-vi-prompt")) el("v2z-vi-prompt").textContent = item.vi;
+      if (el("v2z-hint")) el("v2z-hint").textContent = `💡 ${item.hint}`;
+      ui.v2zPicked = [];
+      ui.v2zShuffled = shuffle(item.tiles);
+      if (el("v2z-manual-input")) el("v2z-manual-input").value = "";
+      if (el("v2z-feedback")) el("v2z-feedback").classList.add("hidden");
+      renderV2ZTiles();
+    } else {
+      if (el("z2v-pinyin")) el("z2v-pinyin").textContent = item.py;
+      if (el("z2v-feedback")) el("z2v-feedback").classList.add("hidden");
+      const glossWrap = el("z2v-gloss-segments");
+      if (glossWrap) {
+        glossWrap.innerHTML = item.gloss
+          .map(
+            (g) => `
+          <button onclick="VoiceService.speak('${g.w}')" class="card-compact" style="padding:10px 14px;text-align:center;" title="Bấm để nghe cụm từ">
+            <div class="hanzi" style="font-size:24px;font-weight:900;">${g.w}</div>
+            <div style="font-size:12px;color:var(--primary);font-weight:700;">${g.py}</div>
+            <div style="font-size:12px;color:var(--text-muted);">${g.vi}</div>
+          </button>`
+          )
+          .join("");
+      }
+
+      const pool = DB.SENTENCES_DB.filter((s) => s.id !== item.id).map((s) => s.vi);
+      ui.z2vOptions = shuffle([item.vi, ...shuffle(pool).slice(0, 3)]);
+      const optWrap = el("z2v-options");
+      if (optWrap) {
+        optWrap.innerHTML = ui.z2vOptions
+          .map(
+            (opt, idx) => `
+          <button onclick="App.checkZ2VChoice(${idx})" class="vocab-row" style="padding:13px 16px;font-weight:600;">
+            <span>${idx + 1}. ${opt}</span>
+          </button>`
+          )
+          .join("");
+      }
+    }
+  }
+
+  function renderV2ZTiles() {
+    const well = el("v2z-answer-well");
+    const bank = el("v2z-tile-bank");
+    if (!well || !bank) return;
+
+    well.classList.toggle("filled", ui.v2zPicked.length > 0);
+    if (ui.v2zPicked.length === 0) {
+      well.innerHTML = `<span style="font-size:13px;color:var(--text-muted);">Chạm vào các thẻ từ Phồn thể bên dưới để ghép thành câu hoàn chỉnh...</span>`;
+    } else {
+      well.innerHTML = ui.v2zPicked
+        .map(
+          (tileIdx, pos) => `
+        <button onclick="App.removeV2ZTile(${pos})" class="word-tile tile-picked hanzi">
+          ${ui.v2zShuffled[tileIdx]}
+        </button>`
+        )
+        .join("");
+    }
+
+    bank.innerHTML = ui.v2zShuffled
+      .map((word, idx) => {
+        const used = ui.v2zPicked.includes(idx);
+        return `
+        <button onclick="App.pickV2ZTile(${idx})" ${used ? "disabled" : ""} class="word-tile hanzi">
+          ${word}
+        </button>`;
+      })
+      .join("");
+  }
+
+  function pickV2ZTile(idx) {
+    if (ui.v2zPicked.includes(idx)) return;
+    const word = ui.v2zShuffled[idx];
+    if (!/[，。？！]/.test(word)) Voice.speak(word);
+    else Voice.playEffect("pop");
+    ui.v2zPicked.push(idx);
+    renderV2ZTiles();
+    if (ui.v2zPicked.length === ui.v2zShuffled.length) {
+      checkV2ZAnswer();
+    }
+  }
+
+  function removeV2ZTile(pos) {
+    Voice.playEffect("pop");
+    ui.v2zPicked.splice(pos, 1);
+    renderV2ZTiles();
+  }
+
+  function resetV2Z() {
+    Voice.playEffect("pop");
+    ui.v2zPicked = [];
+    if (el("v2z-manual-input")) el("v2z-manual-input").value = "";
+    if (el("v2z-feedback")) el("v2z-feedback").classList.add("hidden");
+    renderV2ZTiles();
+  }
+
+  function checkV2ZAnswer() {
+    const list = Store.getSentences();
+    const item = list[ui.sentIdx];
+    if (!item) return;
+
+    const typed = (el("v2z-manual-input")?.value || "").trim();
+    const built = typed || ui.v2zPicked.map((i) => ui.v2zShuffled[i]).join("");
+    const cleanBuilt = Speech.cleanHanzi(built);
+    const cleanTarget = Speech.cleanHanzi(item.zh);
+
+    const fb = el("v2z-feedback");
+    if (!fb) return;
+    fb.classList.remove("hidden");
+
+    if (cleanBuilt && cleanBuilt === cleanTarget) {
+      Voice.playEffect("win");
+      Voice.speak(item.zh);
+      Store.state.stats.sentencesDone++;
+      Store.completeComebackTask("t2");
+      syncTopBar();
+      fb.style.background = "var(--jade-soft)";
+      fb.style.borderColor = "var(--jade-border)";
+      fb.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:800;color:var(--jade);">✅ Chính xác! Bạn đã đặt câu chuẩn ngữ pháp Phồn thể:</div>
+            <div class="hanzi" style="font-size:20px;font-weight:900;margin-top:4px;">${item.zh}</div>
+            <div style="font-size:13px;color:var(--text-secondary);">${item.py}</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="App.jumpToSpeakSentence()" class="btn btn-sm btn-outline">🎙️ Luyện nói câu này</button>
+            <button onclick="App.stepSentence(1)" class="btn btn-sm btn-jade">Câu tiếp theo ➔</button>
+          </div>
+        </div>`;
+    } else {
+      Voice.playEffect("wrong");
+      fb.style.background = "var(--primary-soft)";
+      fb.style.borderColor = "var(--primary)";
+      fb.innerHTML = `
+        <div style="font-weight:800;color:var(--primary-text);">⚠️ Chưa khớp hoàn toàn. Hãy kiểm tra lại trật tự từ:</div>
+        <div style="font-size:13px;margin-top:4px;">Câu của bạn: <b class="hanzi">${DB.toTraditional(built) || "(chưa chọn)"}</b></div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:2px;">Gợi ý: ${item.hint}</div>`;
+    }
+  }
+
+  function checkZ2VChoice(optIdx) {
+    const list = Store.getSentences();
+    const item = list[ui.sentIdx];
+    if (!item) return;
+    const chosen = ui.z2vOptions[optIdx];
+    const fb = el("z2v-feedback");
+    if (!fb) return;
+    fb.classList.remove("hidden");
+
+    if (chosen === item.vi) {
+      Voice.playEffect("win");
+      Voice.speak(item.zh);
+      Store.state.stats.sentencesDone++;
+      Store.completeComebackTask("t2");
+      syncTopBar();
+      fb.style.background = "var(--jade-soft)";
+      fb.style.borderColor = "var(--jade-border)";
+      fb.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:800;color:var(--jade);">✅ Dịch chính xác!</div>
+            <div style="font-size:14px;margin-top:2px;">"${item.vi}"</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="App.jumpToSpeakSentence()" class="btn btn-sm btn-outline">🎙️ Luyện nói câu này</button>
+            <button onclick="App.stepSentence(1)" class="btn btn-sm btn-jade">Câu tiếp theo ➔</button>
+          </div>
+        </div>`;
+    } else {
+      Voice.playEffect("wrong");
+      fb.style.background = "var(--primary-soft)";
+      fb.style.borderColor = "var(--primary)";
+      fb.innerHTML = `<div style="font-weight:800;color:var(--primary-text);">❌ Chưa đúng. Hãy chạm vào từng cụm chữ Hán ở trên để xem nghĩa rồi chọn lại nhé!</div>`;
+    }
+  }
+
+  function stepSentence(delta) {
+    const list = Store.getSentences();
+    if (!list.length) return;
+    Voice.playEffect("pop");
+    ui.sentIdx = (ui.sentIdx + delta + list.length) % list.length;
+    prepareSentenceQuestion();
+  }
+
+  function speakCurrentSentence(gender, slow) {
+    const item = Store.getSentences()[ui.sentIdx];
+    if (!item) return;
+    Voice.speak(item.zh, gender, slow ? 0.72 : undefined);
+  }
+
+  function jumpToSpeakSentence() {
+    ui.speakSubMode = "sentence";
+    ui.speakIdx = ui.sentIdx;
+    setStep("speak");
+  }
+
+  // ==========================================================================
+  // STEP 3: 口說 Phòng Luyện Nói & Chấm Phát Âm (zh-TW)
+  // ==========================================================================
+  function getSpeakItems() {
+    if (ui.speakSubMode === "word") {
+      return Store.getVocab().map((w) => ({
+        lesson: w.lesson,
+        part: w.part,
+        tag: `Bài ${w.lesson} (P.${w.part}) • Từ vựng`,
+        zh: w.hz,
+        py: w.py,
+        vi: `${w.vi} — Ví dụ: ${w.exZh}`,
+        tip: `Chú ý giữ đúng thanh điệu của 『${w.hz}』(${w.py}) và phát âm rõ khẩu hình.`
+      }));
+    }
+    if (ui.speakSubMode === "roleplay") {
+      return Store.getRoleplay().map((r) => ({
+        lesson: r.lesson,
+        part: r.part,
+        tag: `Bài ${r.lesson} (P.${r.part}) • Hội thoại nhập vai`,
+        speaker: r.speaker,
+        questionZh: r.questionZh,
+        questionPy: r.questionPy,
+        questionVi: r.questionVi,
+        zh: r.zh,
+        py: r.py,
+        vi: r.vi,
+        tip: r.tip
+      }));
+    }
+    return Store.getSentences().map((s) => ({
+      lesson: s.lesson,
+      part: s.part,
+      tag: s.tag,
+      zh: s.zh,
+      py: s.py,
+      vi: s.vi,
+      tip: s.hint
+    }));
+  }
+
+  function setSpeakSubMode(mode) {
+    Voice.playEffect("pop");
+    if (Speech.getIsRecording()) Speech.stopRecording(false);
+    ui.speakSubMode = mode;
+    ui.speakIdx = 0;
+    ["sentence", "word", "roleplay"].forEach((m) => {
+      el("spk-sub-" + m)?.classList.toggle("active", m === mode);
+    });
+    renderSpeakStep();
+  }
+
+  function renderSpeakTargetChars(zhText, activeCharIdx = -1) {
+    const wrap = el("spk-target-zh");
+    if (!wrap) return;
+    let cleanCounter = 0;
+    wrap.innerHTML = Array.from(zhText || "")
+      .map((ch) => {
+        if (/[，。？！、\s]/.test(ch)) {
+          return `<span style="opacity:0.55;">${ch}</span>`;
+        }
+        const idx = cleanCounter++;
+        const cls =
+          idx === activeCharIdx
+            ? "speak-char char-active"
+            : activeCharIdx >= 0 && idx < activeCharIdx
+            ? "speak-char char-done"
+            : "speak-char";
+        return `<span onclick="VoiceService.speak('${ch}')" title="Bấm để nghe chữ ${ch}" class="${cls}">${ch}</span>`;
+      })
+      .join("");
+  }
+
+  function renderSpeakStep() {
+    const list = getSpeakItems();
+    if (!list.length) return;
+    if (ui.speakIdx >= list.length) ui.speakIdx = 0;
+    if (ui.speakIdx < 0) ui.speakIdx = list.length - 1;
+    const item = list[ui.speakIdx];
+    ui.charOverrides = {};
+
+    ["sentence", "word", "roleplay"].forEach((m) => {
+      el("spk-sub-" + m)?.classList.toggle("active", m === ui.speakSubMode);
+    });
+
+    if (el("spk-tag")) el("spk-tag").textContent = item.tag;
+    if (el("spk-counter")) el("spk-counter").textContent = `Mục ${ui.speakIdx + 1} / ${list.length}`;
+    renderSpeakTargetChars(item.zh, -1);
+    if (el("spk-target-py")) el("spk-target-py").textContent = item.py;
+    if (el("spk-target-vi")) el("spk-target-vi").textContent = `"${item.vi}"`;
+    if (el("spk-tip")) el("spk-tip").textContent = `💡 ${item.tip}`;
+
+    const rpBox = el("spk-roleplay-box");
+    if (rpBox) {
+      if (ui.speakSubMode === "roleplay" && item.questionZh) {
+        rpBox.classList.remove("hidden");
+        if (el("spk-rp-speaker")) el("spk-rp-speaker").textContent = `🧑‍🏫 Đối tác: ${item.speaker}`;
+        if (el("spk-rp-qzh")) el("spk-rp-qzh").textContent = item.questionZh;
+        if (el("spk-rp-qpy")) el("spk-rp-qpy").textContent = `${item.questionPy} — (${item.questionVi})`;
+      } else {
+        rpBox.classList.add("hidden");
+      }
+    }
+
+    if (el("spk-input")) el("spk-input").value = "";
+    if (el("spk-eval-card")) el("spk-eval-card").classList.add("hidden");
+    if (el("spk-diag-box")) el("spk-diag-box").classList.add("hidden");
+    if (el("spk-status")) {
+      el("spk-status").textContent = "Sẵn sàng thu âm — bấm nút Bấm để nói bên trái";
+    }
+    const openTop = el("spk-open-https-top");
+    if (openTop) {
+      openTop.classList.toggle("hidden", !Speech.isEmbedded() || Speech.onPublicSite());
+    }
+  }
+
+  function stepSpeak(delta) {
+    const list = getSpeakItems();
+    if (!list.length) return;
+    Voice.playEffect("pop");
+    if (Speech.getIsRecording()) Speech.stopRecording(false);
+    ui.speakIdx = (ui.speakIdx + delta + list.length) % list.length;
+    renderSpeakStep();
+  }
+
+  function speakTargetAudio(gender, slow) {
+    const item = getSpeakItems()[ui.speakIdx];
+    if (!item) return;
+    Voice.speak(item.zh, gender, slow ? 0.7 : undefined);
+  }
+
+  function speakRoleplayPartner() {
+    const item = getSpeakItems()[ui.speakIdx];
+    if (item && item.questionZh) Voice.speak(item.questionZh);
+  }
+
+  function setWaveformLevel(level) {
+    const wave = el("spk-waveform");
+    if (!wave) return;
+    const bars = wave.querySelectorAll("span");
+    bars.forEach((b, i) => {
+      if (level <= 0) {
+        b.style.height = i % 2 === 0 ? "8px" : "13px";
+      } else {
+        const h = 5 + Math.round(level * 22 * (0.6 + 0.4 * Math.sin(Date.now() / 85 + i)));
+        b.style.height = `${Math.max(5, h)}px`;
+      }
+    });
+  }
+
+  function startIdleWaveAnimation(active) {
+    if (ui.waveIdleTimer) {
+      clearInterval(ui.waveIdleTimer);
+      ui.waveIdleTimer = null;
+    }
+    if (!active) {
+      setWaveformLevel(0);
+      return;
+    }
+    ui.waveIdleTimer = setInterval(() => {
+      setWaveformLevel(0.35 + Math.random() * 0.45);
+    }, 110);
+  }
+
+  function toggleMic() {
+    Voice.playEffect("pop");
+    if (Speech.getIsRecording()) {
+      Speech.stopRecording(true);
+      return;
+    }
+
+    const list = getSpeakItems();
+    const item = list[ui.speakIdx];
+    if (!item) return;
+
+    const micBtn = el("spk-mic-btn");
+    const statusEl = el("spk-status");
+    const inp = el("spk-input");
+    const diagBox = el("spk-diag-box");
+
+    if (diagBox) diagBox.classList.add("hidden");
+    if (el("spk-eval-card")) el("spk-eval-card").classList.add("hidden");
+    if (inp) inp.value = "";
+
+    startIdleWaveAnimation(true);
+
+    Speech.startRecording({
+      targetZh: item.zh,
+      onStateChange(phase, remainSec) {
+        if (!micBtn) return;
+        micBtn.classList.add("btn-mic-recording");
+        if (phase === "starting") {
+          micBtn.innerHTML = `<span>⏳</span><span>Đang mở Micro...</span>`;
+          if (statusEl) statusEl.textContent = "Hãy bấm Cho phép (Allow) nếu trình duyệt hỏi quyền Micro";
+        } else if (phase === "listening" || phase === "tick") {
+          micBtn.innerHTML = `<span>⏹️</span><span>Đang thu âm (${remainSec}s) • Bấm để chấm</span>`;
+          if (phase === "listening" && statusEl) {
+            statusEl.textContent = "🔴 Micro đang thu — hãy đọc to rõ câu tiếng Trung ở trên!";
+          }
+        }
+      },
+      onLevel(level) {
+        if (ui.waveIdleTimer) {
+          clearInterval(ui.waveIdleTimer);
+          ui.waveIdleTimer = null;
+        }
+        setWaveformLevel(level);
+      },
+      onAudioReady() {
+        el("spk-playback-btn")?.classList.remove("hidden");
+      },
+      onLiveUpdate(liveText) {
+        if (inp) inp.value = liveText;
+        if (statusEl) statusEl.textContent = `🗣️ Đang nghe: 「${liveText}」`;
+        const targetChars = Array.from(Speech.cleanHanzi(item.zh));
+        const spokenChars = Array.from(Speech.cleanHanzi(liveText));
+        renderSpeakTargetChars(item.zh, Math.min(spokenChars.length, targetChars.length - 1));
+      },
+      onError(errMsg, isFatal) {
+        showSpeakDiagnostic(errMsg, isFatal);
+        if (isFatal && inp) {
+          inp.focus();
+          inp.placeholder =
+            "🎙️ Bấm phím 🎤 Micro trên bàn phím (hoặc Win+H) để nói tiếng Trung trực tiếp vào đây — tự động chấm sau 1 giây!";
+        }
+      },
+      onFinish({ shouldGrade, transcript, error, fatalError }) {
+        startIdleWaveAnimation(false);
+        renderSpeakTargetChars(item.zh, -1);
+        if (micBtn) {
+          micBtn.classList.remove("btn-mic-recording");
+          micBtn.innerHTML = `<span>🎙️</span><span>Bấm để nói (zh-TW)</span>`;
+        }
+        if (!shouldGrade) return;
+
+        const finalSpoken = transcript || (inp ? DB.toTraditional(inp.value.trim()) : "");
+        if (!finalSpoken) {
+          if (statusEl) statusEl.textContent = "⚠️ Chưa nhận được câu tiếng Trung nào.";
+          showSpeakDiagnostic(
+            error ||
+              "Chưa thu được giọng nói. Nếu bạn đang ở khung xem trước của chat, hãy mở ứng dụng ở tab riêng (HTTPS) hoặc dùng phím 🎤 Micro trên bàn phím để nói vào ô chữ Hán.",
+            Speech.isEmbedded() || fatalError
+          );
+          if (Speech.isEmbedded() && inp) inp.focus();
+          Voice.playEffect("wrong");
+          return;
+        }
+        if (inp) inp.value = finalSpoken;
+        if (statusEl) statusEl.textContent = `✅ Đã thu nhận: 「${finalSpoken}」`;
+        evaluateCurrentSpeech(finalSpoken);
+      }
+    });
+  }
+
+  function showSpeakDiagnostic(msg, showLink) {
+    const box = el("spk-diag-box");
+    const text = el("spk-diag-text");
+    const link = el("spk-diag-link");
+    if (!box || !text) return;
+    box.classList.remove("hidden");
+    text.textContent = msg;
+    if (link) {
+      link.classList.toggle("hidden", !showLink || Speech.onPublicSite());
+    }
+  }
+
+  function handleSpeakInputLive(val) {
+    const clean = DB.toTraditional((val || "").trim());
+    if (!clean) return;
+    const item = getSpeakItems()[ui.speakIdx];
+    if (item) {
+      const spokenLen = Array.from(Speech.cleanHanzi(clean)).length;
+      const targetLen = Array.from(Speech.cleanHanzi(item.zh)).length;
+      renderSpeakTargetChars(item.zh, Math.min(spokenLen - 1, targetLen - 1));
+    }
+    const statusEl = el("spk-status");
+    if (statusEl) statusEl.textContent = `🗣️ Đang nhận: 「${clean}」 (tự động chấm sau 1 giây)...`;
+    if (ui.dictationTimer) clearTimeout(ui.dictationTimer);
+    ui.dictationTimer = setTimeout(() => {
+      evaluateCurrentSpeech(clean);
+    }, 1100);
+  }
+
+  function runDemoSpeech(preset) {
+    Voice.playEffect("pop");
+    if (Speech.getIsRecording()) Speech.stopRecording(false);
+    ui.charOverrides = {};
+    const item = getSpeakItems()[ui.speakIdx];
+    if (!item) return;
+
+    let sample = item.zh;
+    if (preset === "near") {
+      const chars = Array.from(item.zh);
+      for (let i = 0; i < chars.length; i++) {
+        const grp = DB.HOMOPHONE_GROUPS.find((g) => g.includes(chars[i]));
+        if (grp) {
+          const alt = grp.find((c) => c !== chars[i]);
+          if (alt) {
+            chars[i] = alt;
+            break;
+          }
+        }
+      }
+      sample = chars.join("");
+    } else if (preset === "wrong") {
+      sample = item.zh.slice(0, Math.max(2, Math.floor(item.zh.length / 2)));
+    }
+    if (el("spk-input")) el("spk-input").value = sample;
+    if (el("spk-status")) el("spk-status").textContent = `🧪 Demo chấm mẫu với câu: 「${sample}」`;
+    evaluateCurrentSpeech(sample);
+  }
+
+  function toggleCharOverride(charIdx) {
+    Voice.playEffect("pop");
+    const cur = ui.charOverrides[charIdx] || "exact";
+    const nextMap = { exact: "near", near: "missing", missing: "exact" };
+    ui.charOverrides[charIdx] = nextMap[cur] || "near";
+    evaluateCurrentSpeech(el("spk-input")?.value, true);
+  }
+
+  function evaluateCurrentSpeech(overrideText, isReEval = false) {
+    const item = getSpeakItems()[ui.speakIdx];
+    if (!item) return;
+    const raw = overrideText !== undefined ? overrideText : el("spk-input")?.value || "";
+    const res = Speech.gradeSpeech(item.zh, raw, ui.charOverrides);
+
+    if (!res) {
+      if (el("spk-status")) {
+        el("spk-status").textContent = "⚠️ Chưa có câu tiếng Trung nào để chấm — hãy bấm Bấm để nói trước.";
+      }
+      if (el("spk-eval-card")) el("spk-eval-card").classList.add("hidden");
+      return;
+    }
+
+    res.charResults.forEach((cr) => {
+      ui.charOverrides[cr.idx] = cr.status;
+    });
+
+    if (!isReEval) {
+      Store.state.stats.speakScores.push(res.totalScore);
+      Store.completeComebackTask("t3");
+      syncTopBar();
+      if (res.totalScore >= 80) Voice.playEffect("win");
+      else Voice.playEffect("wrong");
+    }
+
+    const card = el("spk-eval-card");
+    if (card) card.classList.remove("hidden");
+
+    if (el("spk-score-badge")) {
+      el("spk-score-badge").textContent = `${res.totalScore}%`;
+      el("spk-score-badge").style.background =
+        res.totalScore >= 85
+          ? "var(--jade)"
+          : res.totalScore >= 65
+          ? "var(--amber)"
+          : "var(--primary)";
+    }
+
+    if (el("spk-verdict-title")) {
+      el("spk-verdict-title").textContent =
+        res.totalScore >= 88
+          ? "🏆 Phát âm rất chuẩn Đài Loan! (發音非常標準)"
+          : res.totalScore >= 65
+          ? "👍 Khá tốt! Chỉ cần chỉnh nhẹ thanh điệu một vài chữ"
+          : "💪 Cần đọc chậm và rõ từng chữ Hán hơn";
+    }
+    if (el("spk-verdict-sub")) {
+      el("spk-verdict-sub").textContent = `Khớp chính xác ${res.exactCount}/${res.totalTarget} chữ Phồn thể • Thanh điệu: ${res.toneScore}% • Độ trôi chảy: ${res.fluencyScore}%`;
+    }
+
+    const grid = el("spk-char-grid");
+    if (grid) {
+      grid.innerHTML = res.charResults
+        .map((cr) => {
+          const statusLabel =
+            cr.status === "exact"
+              ? "✅ Chuẩn"
+              : cr.status === "near"
+              ? `⚠️ Lệch: ${cr.spoken}`
+              : "❌ Thiếu";
+          return `
+          <div class="char-eval-card status-${cr.status}">
+            <button onclick="VoiceService.speak('${cr.target}')" style="display:flex;flex-direction:column;align-items:center;" title="Bấm để nghe phát âm chữ ${cr.target}">
+              <span style="font-size:12px;color:var(--text-secondary);font-weight:700;">🔊 ${cr.py || "—"}</span>
+              <span class="hanzi" style="font-size:24px;font-weight:900;">${cr.target}</span>
+              <span style="font-size:12px;font-weight:700;">${statusLabel}</span>
+            </button>
+            <button onclick="App.toggleCharOverride(${cr.idx})" class="tag" style="margin-top:4px;font-size:12px;">🔁 Đổi</button>
+          </div>`;
+        })
+        .join("");
+    }
+
+    const notesEl = el("spk-teacher-notes");
+    if (notesEl) {
+      const lines = [];
+      lines.push(
+        `<div>• <b>Câu thu nhận:</b> <span class="hanzi" style="font-weight:800;">「${res.spokenTrad}」</span> — <b>Câu chuẩn:</b> <span class="hanzi" style="font-weight:800;color:var(--jade);">「${item.zh}」</span></div>`
+      );
+      if (res.nearNotes.length) {
+        lines.push(
+          `<div style="color:var(--amber);margin-top:4px;">⚠️ <b>Lệch âm / thanh điệu:</b> ${res.nearNotes.join("; ")}.</div>`
+        );
+      }
+      if (res.missingNotes.length) {
+        lines.push(
+          `<div style="color:var(--primary-text);margin-top:4px;">❌ <b>Chữ còn thiếu hoặc chưa rõ:</b> ${res.missingNotes.join(", ")}. Hãy bấm vào từng ô chữ ở trên để nghe mẫu riêng từng chữ.</div>`
+        );
+      }
+      if (res.totalScore >= 88 && !res.nearNotes.length && !res.missingNotes.length) {
+        lines.push(
+          `<div style="color:var(--jade);margin-top:4px;">✅ Bạn phát âm đầy đủ các âm tiết và giữ đúng thanh điệu Bài ${item.lesson}.</div>`
+        );
+      }
+      notesEl.innerHTML = lines.join("");
+    }
+  }
+
+  // ==========================================================================
+  // STEP 4: 測驗 Kiểm tra & Tiến độ
+  // ==========================================================================
+  function setTestSubMode(mode) {
+    Voice.playEffect("pop");
+    ui.testSubMode = mode;
+    ["match", "detective", "quiz", "progress"].forEach((m) => {
+      el("tsub-" + m)?.classList.toggle("active", m === mode);
+      el("test-view-" + m)?.classList.toggle("hidden", m !== mode);
+    });
+    renderTestStep();
+  }
+
+  function renderTestStep() {
+    ["match", "detective", "quiz", "progress"].forEach((m) => {
+      el("tsub-" + m)?.classList.toggle("active", m === ui.testSubMode);
+      el("test-view-" + m)?.classList.toggle("hidden", m !== ui.testSubMode);
+    });
+
+    if (ui.testSubMode === "match") {
+      if (!ui.matchCards.length) initMatchGame();
+      else renderMatchBoard();
+    } else if (ui.testSubMode === "detective") {
+      renderDetectiveQuestion();
+    } else if (ui.testSubMode === "quiz") {
+      if (!ui.quizItem) nextQuickQuiz();
+      else renderQuickQuiz();
+    } else if (ui.testSubMode === "progress") {
+      renderProgressDashboard();
+    }
+  }
+
+  function initMatchGame() {
+    const pool = shuffle(Store.getVocab()).slice(0, 6);
+    const cards = [];
+    pool.forEach((w) => {
+      cards.push({ id: w.id, type: "hz", label: w.hz, sub: w.py, hz: w.hz });
+      cards.push({ id: w.id, type: "vi", label: w.vi, sub: `Bài ${w.lesson}`, hz: w.hz });
+    });
+    ui.matchCards = shuffle(cards);
+    ui.matchFirstIdx = null;
+    ui.matchMatched = new Set();
+    renderMatchBoard();
+  }
+
+  function renderMatchBoard() {
+    const board = el("match-board");
+    if (!board) return;
+    if (ui.matchMatched.size === ui.matchCards.length && ui.matchCards.length > 0) {
+      board.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:24px;">
+          <div style="font-size:18px;font-weight:800;color:var(--jade);margin-bottom:8px;">🎉 Hoàn thành ghép cặp xuất sắc!</div>
+          <button onclick="App.initMatchGame()" class="btn btn-primary">🔄 Chơi ván mới</button>
+        </div>`;
+      return;
+    }
+    board.innerHTML = ui.matchCards
+      .map((c, idx) => {
+        const done = ui.matchMatched.has(idx);
+        const picked = ui.matchFirstIdx === idx;
+        return `
+        <button onclick="App.pickMatchCard(${idx})" ${done ? "disabled" : ""} class="card-compact" style="text-align:center;padding:16px 12px;border-color:${
+          picked ? "var(--primary)" : done ? "var(--jade-border)" : "var(--border)"
+        };background:${
+          picked ? "var(--primary-soft)" : done ? "var(--jade-soft)" : "var(--surface)"
+        };">
+          <div class="${c.type === "hz" ? "hanzi" : ""}" style="font-size:${
+          c.type === "hz" ? "22px" : "14px"
+        };font-weight:800;">${c.label}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">${c.sub}</div>
+        </button>`;
+      })
+      .join("");
+  }
+
+  function pickMatchCard(idx) {
+    if (ui.matchMatched.has(idx) || ui.matchFirstIdx === idx) return;
+    const card = ui.matchCards[idx];
+    if (card.type === "hz") Voice.speak(card.hz);
+    else Voice.playEffect("pop");
+
+    if (ui.matchFirstIdx === null) {
+      ui.matchFirstIdx = idx;
+      renderMatchBoard();
+      return;
+    }
+
+    const first = ui.matchCards[ui.matchFirstIdx];
+    if (first.id === card.id && first.type !== card.type) {
+      Voice.playEffect("win");
+      ui.matchMatched.add(ui.matchFirstIdx);
+      ui.matchMatched.add(idx);
+      Store.state.stats.quizRight++;
+      Store.state.stats.quizTotal++;
+    } else {
+      Voice.playEffect("wrong");
+      Store.state.stats.quizTotal++;
+    }
+    ui.matchFirstIdx = null;
+    renderMatchBoard();
+  }
+
+  function renderDetectiveQuestion() {
+    const list = Store.getDetective();
+    if (!list.length) return;
+    if (ui.detectiveIdx >= list.length) ui.detectiveIdx = 0;
+    const item = list[ui.detectiveIdx];
+
+    if (el("det-tag")) el("det-tag").textContent = `Bài ${item.lesson} (Phần ${item.part}) • Câu ${ui.detectiveIdx + 1}/${list.length}`;
+    if (el("det-wrong-zh")) el("det-wrong-zh").textContent = item.wrongZh;
+    if (el("det-feedback")) el("det-feedback").classList.add("hidden");
+
+    const optWrap = el("det-options");
+    if (optWrap) {
+      optWrap.innerHTML = item.options
+        .map(
+          (opt, idx) => `
+        <button onclick="App.checkDetective(${idx})" class="vocab-row" style="padding:13px 16px;font-weight:600;">
+          <span>${idx + 1}. ${opt}</span>
+        </button>`
+        )
+        .join("");
+    }
+  }
+
+  function checkDetective(idx) {
+    const list = Store.getDetective();
+    const item = list[ui.detectiveIdx];
+    if (!item) return;
+    const fb = el("det-feedback");
+    if (!fb) return;
+    fb.classList.remove("hidden");
+    Store.state.stats.quizTotal++;
+
+    if (idx === item.correctIdx) {
+      Store.state.stats.quizRight++;
+      Voice.playEffect("win");
+      Voice.speak(item.correctZh);
+      fb.style.background = "var(--jade-soft)";
+      fb.style.borderColor = "var(--jade-border)";
+      fb.innerHTML = `
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div style="font-weight:800;color:var(--jade);">✅ Chính xác! Câu chuẩn Phồn thể là:</div>
+            <div class="hanzi" style="font-size:20px;font-weight:900;margin-top:2px;">${item.correctZh}</div>
+            <div style="font-size:13px;color:var(--text-secondary);">${item.py}</div>
+          </div>
+          <button onclick="App.nextDetective()" class="btn btn-sm btn-jade">Câu tiếp theo ➔</button>
+        </div>`;
+    } else {
+      Voice.playEffect("wrong");
+      fb.style.background = "var(--primary-soft)";
+      fb.style.borderColor = "var(--primary)";
+      fb.innerHTML = `<div style="font-weight:800;color:var(--primary-text);">❌ Chưa đúng điểm sai ngữ pháp. Hãy xem lại cấu trúc câu rồi chọn lại!</div>`;
+    }
+  }
+
+  function nextDetective() {
+    const list = Store.getDetective();
+    ui.detectiveIdx = (ui.detectiveIdx + 1) % list.length;
+    renderDetectiveQuestion();
+  }
+
+  function nextQuickQuiz() {
+    const pool = Store.getVocab();
+    if (!pool.length) return;
+    ui.quizItem = pool[Math.floor(Math.random() * pool.length)];
+    const distractors = shuffle(DB.VOCAB_DB.filter((v) => v.id !== ui.quizItem.id))
+      .slice(0, 3)
+      .map((v) => v.vi);
+    ui.quizOptions = shuffle([ui.quizItem.vi, ...distractors]);
+    renderQuickQuiz();
+  }
+
+  function renderQuickQuiz() {
+    const item = ui.quizItem;
+    if (!item) return;
+    if (el("qq-hanzi")) el("qq-hanzi").textContent = item.hz;
+    if (el("qq-pinyin")) el("qq-pinyin").textContent = item.py;
+    if (el("qq-score")) {
+      el("qq-score").textContent = `Đúng ${Store.state.stats.quizRight} / ${Store.state.stats.quizTotal} lượt`;
+    }
+    if (el("qq-feedback")) el("qq-feedback").classList.add("hidden");
+    const optWrap = el("qq-options");
+    if (optWrap) {
+      optWrap.innerHTML = ui.quizOptions
+        .map(
+          (opt, idx) => `
+        <button onclick="App.answerQuickQuiz(${idx})" class="vocab-row" style="padding:14px 16px;font-weight:700;">
+          <span>${opt}</span>
+        </button>`
+        )
+        .join("");
+    }
+  }
+
+  function answerQuickQuiz(idx) {
+    const item = ui.quizItem;
+    if (!item) return;
+    const chosen = ui.quizOptions[idx];
+    const fb = el("qq-feedback");
+    Store.state.stats.quizTotal++;
+    if (chosen === item.vi) {
+      Store.state.stats.quizRight++;
+      Voice.playEffect("win");
+      Voice.speak(item.hz);
+      if (fb) {
+        fb.classList.remove("hidden");
+        fb.style.background = "var(--jade-soft)";
+        fb.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-weight:800;color:var(--jade);">✅ Chính xác: ${item.hz} (${item.py}) = ${item.vi}</span>
+          <button onclick="App.nextQuickQuiz()" class="btn btn-sm btn-jade">Tiếp tục ➔</button>
+        </div>`;
+      }
+    } else {
+      Voice.playEffect("wrong");
+      if (fb) {
+        fb.classList.remove("hidden");
+        fb.style.background = "var(--primary-soft)";
+        fb.innerHTML = `<span style="font-weight:800;color:var(--primary-text);">❌ Chưa đúng — hãy thử lại!</span>`;
+      }
+    }
+    if (el("qq-score")) {
+      el("qq-score").textContent = `Đúng ${Store.state.stats.quizRight} / ${Store.state.stats.quizTotal} lượt`;
+    }
+  }
+
+  function renderProgressDashboard() {
+    const s = Store.state.stats;
+    const avgSpk = s.speakScores.length
+      ? Math.round(s.speakScores.reduce((a, b) => a + b, 0) / s.speakScores.length)
+      : 0;
+    const acc = s.quizTotal ? Math.round((s.quizRight / s.quizTotal) * 100) : 100;
+
+    if (el("prog-vocab-count")) el("prog-vocab-count").textContent = `${s.vocabReviewed} từ`;
+    if (el("prog-sent-count")) el("prog-sent-count").textContent = `${s.sentencesDone} câu`;
+    if (el("prog-speak-avg")) el("prog-speak-avg").textContent = s.speakScores.length ? `${avgSpk}%` : "Chưa thu";
+    if (el("prog-quiz-acc")) el("prog-quiz-acc").textContent = `${acc}%`;
+  }
+
+  // ==========================================================================
+  // MODALS: Scope Filter & 5-Day Comeback Mission
+  // ==========================================================================
+  function openScopeModal() {
+    Voice.playEffect("pop");
+    renderScopeModal();
+    el("modal-scope")?.classList.remove("hidden");
+  }
+
+  function closeScopeModal() {
+    el("modal-scope")?.classList.add("hidden");
+  }
+
+  function renderScopeModal() {
+    const lGrid = el("scope-lessons-grid");
+    if (lGrid) {
+      lGrid.innerHTML = DB.LESSONS_META.map((m) => {
+        const active = Store.state.activeLessons.includes(m.id);
+        return `
+        <div class="card-compact" style="border-color:${active ? "var(--primary)" : "var(--border)"};background:${
+          active ? "var(--primary-soft)" : "var(--surface)"
+        };">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+            <label style="display:flex;align-items:center;gap:8px;font-weight:800;cursor:pointer;">
+              <input type="checkbox" ${active ? "checked" : ""} onchange="App.handleToggleLesson(${m.id})" />
+              <span>${m.titleVi}</span>
+            </label>
+            <button onclick="App.handleOnlyLesson(${m.id})" class="tag">Chỉ học bài này</button>
+          </div>
+          <div class="hanzi" style="font-size:13px;font-weight:700;color:var(--primary-text);margin-top:4px;">${m.titleZh}</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:2px;">${m.goal}</div>
+        </div>`;
+      }).join("");
+    }
+
+    ["ALL", 1, 2].forEach((p) => {
+      const btn = el("scope-part-" + p);
+      if (btn) btn.classList.toggle("active", Store.state.activePart === p);
+    });
+
+    ["female", "male", "duet"].forEach((g) => {
+      el("voice-opt-" + g)?.classList.toggle("active", Store.state.voiceGender === g);
+    });
+    [0.8, 1.0, 1.15].forEach((r) => {
+      el("rate-opt-" + String(r).replace(".", "_"))?.classList.toggle("active", Store.state.voiceRate === r);
+    });
+
+    const wordsInLessons = DB.VOCAB_DB.filter(
+      (v) =>
+        Store.state.activeLessons.includes(v.lesson) &&
+        (Store.state.activePart === "ALL" || v.part === Store.state.activePart)
+    );
+    const wGrid = el("scope-words-grid");
+    if (wGrid) {
+      wGrid.innerHTML = wordsInLessons
+        .map((w) => {
+          const enabled = !Store.state.disabledWordIds.has(w.id);
+          return `
+          <button onclick="App.handleToggleWord('${w.id}')" class="pill-btn ${enabled ? "pill-primary" : ""}" style="opacity:${
+            enabled ? "1" : "0.45"
+          };">
+            <span>${enabled ? "✓" : "+"}</span>
+            <span class="hanzi" style="font-weight:800;">${w.hz}</span>
+            <span>(${w.vi})</span>
+          </button>`;
+        })
+        .join("");
+    }
+  }
+
+  function handleToggleLesson(id) {
+    Store.toggleLesson(id);
+    renderScopeModal();
+    refreshAll();
+  }
+
+  function handleOnlyLesson(id) {
+    Store.setOnlyLesson(id);
+    renderScopeModal();
+    refreshAll();
+  }
+
+  function handleSelectAllLessons() {
+    Store.setAllLessons();
+    renderScopeModal();
+    refreshAll();
+  }
+
+  function handlePartFilter(part) {
+    Store.setPartFilter(part);
+    renderScopeModal();
+    refreshAll();
+  }
+
+  function handleToggleWord(wordId) {
+    Store.toggleWordId(wordId);
+    renderScopeModal();
+    refreshAll();
+  }
+
+  function handleSetAllWords(enabled) {
+    Store.setAllWordsInScope(enabled);
+    renderScopeModal();
+    refreshAll();
+  }
+
+  function openComebackModal() {
+    Voice.playEffect("pop");
+    renderComebackModal();
+    el("modal-comeback")?.classList.remove("hidden");
+  }
+
+  function closeComebackModal() {
+    el("modal-comeback")?.classList.add("hidden");
+  }
+
+  function renderComebackModal() {
+    const listEl = el("comeback-task-list");
+    if (listEl) {
+      listEl.innerHTML = Store.state.comebackTasks
+        .map(
+          (t) => `
+        <div class="vocab-row" style="background:${t.done ? "var(--jade-soft)" : "var(--surface)"};">
+          <span style="font-weight:700;">${t.done ? "✅" : "⬜"} ${t.label}</span>
+          <span class="tag ${t.done ? "tag-jade" : ""}">${t.done ? "Hoàn thành" : "Đang chờ"}</span>
+        </div>`
+        )
+        .join("");
+    }
+    updateFocusTimerUI();
+  }
+
+  function triggerInstantComeback() {
+    Store.state.comebackTasks.forEach((t) => (t.done = true));
+    Store.state.comebackBroken = true;
+    Voice.playEffect("win");
+    Voice.speak("太棒了！歡迎你回來學繁體中文！我們馬上開始吧！");
+    if (!Store.state.stats.focusRunning) toggleFocusTimer();
+    renderComebackModal();
+    syncTopBar();
+  }
+
+  function toggleFocusTimer() {
+    Store.state.stats.focusRunning = !Store.state.stats.focusRunning;
+    if (ui.focusInterval) {
+      clearInterval(ui.focusInterval);
+      ui.focusInterval = null;
+    }
+    if (Store.state.stats.focusRunning) {
+      ui.focusInterval = setInterval(() => {
+        if (Store.state.stats.focusSeconds > 0) {
+          Store.state.stats.focusSeconds--;
+          updateFocusTimerUI();
+        } else {
+          Store.state.stats.focusRunning = false;
+          clearInterval(ui.focusInterval);
+          Voice.playEffect("win");
+        }
+      }, 1000);
+    }
+    updateFocusTimerUI();
+  }
+
+  function updateFocusTimerUI() {
+    const sec = Store.state.stats.focusSeconds;
+    const m = String(Math.floor(sec / 60)).padStart(2, "0");
+    const s = String(sec % 60).padStart(2, "0");
+    if (el("focus-timer-display")) el("focus-timer-display").textContent = `${m}:${s}`;
+    if (el("focus-timer-btn")) {
+      el("focus-timer-btn").textContent = Store.state.stats.focusRunning ? "⏸ Tạm dừng" : "▶️ Bắt đầu 15 phút tập trung";
+    }
+  }
+
+  function init() {
+    syncTopBar();
+    setStep("vocab");
+  }
+
+  return {
+    init,
+    setStep,
+    cycleVoiceGender,
+    setVoiceOption,
+    toggleTheme,
+    dismissComebackStrip,
+    setVocabSubMode,
+    selectVocab,
+    stepVocab,
+    speakCurrentVocab,
+    speakCurrentVocabExample,
+    practiceSpeakCurrentVocab,
+    setSentenceSubMode,
+    pickV2ZTile,
+    removeV2ZTile,
+    resetV2Z,
+    checkV2ZAnswer,
+    checkZ2VChoice,
+    stepSentence,
+    speakCurrentSentence,
+    jumpToSpeakSentence,
+    setSpeakSubMode,
+    stepSpeak,
+    speakTargetAudio,
+    speakRoleplayPartner,
+    toggleMic,
+    handleSpeakInputLive,
+    runDemoSpeech,
+    toggleCharOverride,
+    evaluateCurrentSpeech,
+    setTestSubMode,
+    initMatchGame,
+    pickMatchCard,
+    checkDetective,
+    nextDetective,
+    nextQuickQuiz,
+    answerQuickQuiz,
+    openScopeModal,
+    closeScopeModal,
+    handleToggleLesson,
+    handleOnlyLesson,
+    handleSelectAllLessons,
+    handlePartFilter,
+    handleToggleWord,
+    handleSetAllWords,
+    openComebackModal,
+    closeComebackModal,
+    triggerInstantComeback,
+    toggleFocusTimer
+  };
+})();
+
+window.addEventListener("DOMContentLoaded", () => {
+  window.App.init();
+});
+
+  </script>
+</body>
+</html>
