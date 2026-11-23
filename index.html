@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>當代中文課程 1 — Học Tiếng Trung Phồn Thể Khoa Học (Đài Loan)</title>
+  <meta name="description" content="Ứng dụng học tiếng Trung Phồn thể theo giáo trình Đương Đại 1 (當代中文課程 1) với lộ trình 4 bước: Từ vựng & Chiết tự bộ thủ, Tập viết Mễ Tự Cách, Đặt câu & Nghe chép, Luyện nói AI chấm phát âm zh-TW." />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <!-- ========================================================================
+       1. TOP NAVIGATION BAR (Compact, Single-Row Scientific Stepper)
+       ======================================================================== -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="brand-seal" aria-hidden="true">當</div>
+        <div>
+          <div class="brand-title">當代中文課程 1</div>
+          <div class="brand-subtitle">Tiếng Trung Phồn Thể • Lộ trình 4 bước</div>
+        </div>
+      </div>
+
+      <nav class="step-nav" aria-label="Lộ trình học 4 bước">
+        <button id="nav-step-vocab" onclick="App.setStep('vocab')" class="step-tab active">
+          <span class="step-num">1</span>
+          <span>詞彙 Từ vựng &amp; Viết</span>
+        </button>
+        <button id="nav-step-sentence" onclick="App.setStep('sentence')" class="step-tab">
+          <span class="step-num">2</span>
+          <span>造句 Đặt &amp; Nghe câu</span>
+        </button>
+        <button id="nav-step-speak" onclick="App.setStep('speak')" class="step-tab">
+          <span class="step-num">3</span>
+          <span>口說 Luyện nói</span>
+        </button>
+        <button id="nav-step-test" onclick="App.setStep('test')" class="step-tab">
+          <span class="step-num">4</span>
+          <span>測驗 Kiểm tra</span>
+        </button>
+      </nav>
+
+      <div class="toolbar-actions">
+        <button onclick="App.openScopeModal()" class="pill-btn pill-primary" title="Chọn bài học và giới hạn từ vựng">
+          <span>📚</span>
+          <span id="top-scope-summary">Bài 1–4 (50 từ)</span>
+        </button>
+        <button onclick="App.cycleVoiceGender()" class="pill-btn" title="Bấm để đổi giọng Nữ (雅婷) / Nam (雲哲) / Song thanh">
+          <span id="top-voice-summary">👩 Nữ (雅婷) • 1x</span>
+        </button>
+        <button id="top-comeback-btn" onclick="App.openComebackModal()" class="pill-btn pill-alert" title="Nhiệm vụ phá băng sau 5 ngày nghỉ">
+          🔥 Nghỉ 5 ngày (0/3)
+        </button>
+        <button onclick="App.toggleTheme()" class="pill-btn" title="Đổi giao diện Sáng / Tối">
+          🌗
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Subtle 1-Line Comeback Strip -->
+  <div id="comeback-strip" class="comeback-strip">
+    <div class="comeback-strip-inner">
+      <div>
+        <strong>🔔 Nhắc học sau 5 ngày nghỉ:</strong> Hoàn thành 3 bước ngắn (2 thẻ từ, 1 câu ghép, 1 câu nói) để khôi phục nhịp độ học tiếng Trung Phồn thể!
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button onclick="App.openComebackModal()" class="btn btn-sm btn-primary">Mở lộ trình 15 phút</button>
+        <button onclick="App.dismissComebackStrip()" class="btn btn-sm btn-subtle" title="Ẩn thanh nhắc">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       2. MAIN FOCUSED STUDY WORKSPACE
+       ======================================================================== -->
+  <main class="workspace">
+    <!-- ======================================================================
+         STEP 1: 詞彙 TỪ VỰNG, CHIẾT TỰ, TẬP VIẾT 米字格 & NGỮ PHÁP
+         ====================================================================== -->
+    <section id="panel-step-vocab">
+      <div class="stage-header">
+        <div class="stage-title-group">
+          <h1>Bước 1: 詞彙 Từ vựng, Chiết tự &amp; Tập viết Phồn thể</h1>
+          <p>Học nhanh nhờ cầu nối Âm Hán-Việt, chiết tự bộ thủ, tập viết trên ô Mễ Tự Cách và lọc từ thông minh SRS.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div class="segmented">
+            <button id="vsub-flashcard" onclick="App.setVocabSubMode('flashcard')" class="seg-btn active">🗂️ Thẻ từ &amp; Chiết tự</button>
+            <button id="vsub-writing" onclick="App.setVocabSubMode('writing')" class="seg-btn">✍️ Tập viết chữ Hán</button>
+            <button id="vsub-grammar" onclick="App.setVocabSubMode('grammar')" class="seg-btn">📐 Công thức ngữ pháp</button>
+          </div>
+          <button onclick="App.openScopeModal()" class="btn btn-sm btn-outline">⚙️ Giới hạn bài / từ</button>
+        </div>
+      </div>
+
+      <!-- 1A. Flashcard + Etymology + SRS + Scoped Word List -->
+      <div id="vocab-flashcard-view" class="vocab-grid">
+        <div class="card flashcard-hero">
+          <div style="width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+            <span id="vc-tag" class="tag tag-primary">Bài 1 • Phần 1</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <button id="vc-bookmark-btn" onclick="App.toggleCurrentBookmark()" class="tag">☆ Lưu từ khó</button>
+              <button id="vc-autoplay-btn" onclick="App.toggleAutoPlayVocab()" class="btn btn-sm btn-subtle">🎧 Nghe tự động</button>
+              <span id="vc-counter" class="tag">1 / 50</span>
+            </div>
+          </div>
+
+          <div id="vc-scene" style="margin-top:12px;"></div>
+          <div id="vc-hanzi" class="hanzi-display">請問</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">👆 Chạm vào từng chữ Hán ở trên để xem 3 câu ví dụ sử dụng riêng với chữ đó</div>
+          <div id="vc-pinyin" class="pinyin-display">qǐngwèn</div>
+          <div id="vc-hv" class="hv-badge">Âm Hán-Việt: THỈNH VẤN</div>
+          <div id="vc-meaning" class="meaning-display">Xin hỏi</div>
+
+          <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:6px;">
+            <button onclick="App.speakCurrentVocab('female', false)" class="btn btn-sm btn-primary">👩 Giọng Nữ (雅婷)</button>
+            <button onclick="App.speakCurrentVocab('male', false)" class="btn btn-sm btn-outline">👨 Giọng Nam (雲哲)</button>
+            <button onclick="App.speakCurrentVocab(null, true)" class="btn btn-sm btn-subtle">🐢 Đọc chậm (0.72x)</button>
+            <button onclick="App.setVocabSubMode('writing')" class="btn btn-sm btn-outline">✍️ Tập viết từ này</button>
+            <button onclick="App.practiceSpeakCurrentVocab()" class="btn btn-sm btn-outline">🎙️ Tập nói từ này</button>
+          </div>
+
+          <!-- Radical & Etymology Memory Aid -->
+          <div id="vc-etymology" class="etymology-box"></div>
+
+          <!-- Interactive 3 Usage Examples Explorer (By Word or Individual Character) -->
+          <div class="example-box">
+            <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px;">
+              <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                <span style="font-size:12px;font-weight:800;color:var(--text-muted);text-transform:uppercase;">📖 3 Ví dụ sử dụng:</span>
+                <div id="vc-ex-char-selector" style="display:flex;gap:5px;flex-wrap:wrap;"></div>
+              </div>
+              <div class="segmented">
+                <button id="vc-ex-tab-all" onclick="App.setCardExampleFilter('all')" class="seg-btn active" style="padding:3px 8px;font-size:12px;">Cả 3 ví dụ</button>
+                <button id="vc-ex-tab-0" onclick="App.setCardExampleFilter(0)" class="seg-btn" style="padding:3px 8px;font-size:12px;">VD 1</button>
+                <button id="vc-ex-tab-1" onclick="App.setCardExampleFilter(1)" class="seg-btn" style="padding:3px 8px;font-size:12px;">VD 2</button>
+                <button id="vc-ex-tab-2" onclick="App.setCardExampleFilter(2)" class="seg-btn" style="padding:3px 8px;font-size:12px;">VD 3</button>
+              </div>
+            </div>
+            <div id="vc-examples-list" style="display:flex;flex-direction:column;gap:8px;"></div>
+          </div>
+
+          <!-- Spaced Repetition (SRS) Self-Rating Bar -->
+          <div class="srs-bar">
+            <button id="srs-btn-hard" onclick="App.rateCurrentVocab('hard')" class="srs-btn">😓 Khó nhớ (Ôn kỹ)</button>
+            <button id="srs-btn-good" onclick="App.rateCurrentVocab('good')" class="srs-btn">🙂 Tạm nhớ</button>
+            <button id="srs-btn-easy" onclick="App.rateCurrentVocab('easy')" class="srs-btn">🤩 Đã thuộc lòng</button>
+          </div>
+
+          <div style="width:100%;display:flex;align-items:center;justify-content:space-between;margin-top:16px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;gap:8px;">
+            <button onclick="App.stepVocab(-1)" class="btn btn-outline">⬅ Từ trước</button>
+            <span style="font-size:12px;color:var(--text-muted);">Phím tắt: <span class="kbd-chip">Space</span> nghe • <span class="kbd-chip">←</span> <span class="kbd-chip">→</span> chuyển từ</span>
+            <button onclick="App.stepVocab(1)" class="btn btn-primary">Từ tiếp theo ➔</button>
+          </div>
+        </div>
+
+        <aside class="card-compact">
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:10px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <strong style="font-size:14px;">Từ vựng trong phạm vi</strong>
+              <button onclick="App.openScopeModal()" class="tag">Chọn bài</button>
+            </div>
+            <input type="text" class="input-field" style="padding:7px 11px;font-size:13px;" placeholder="🔍 Tìm chữ Hán, Pinyin, Hán-Việt, nghĩa..." oninput="App.handleVocabSearch(this.value)" />
+            <div class="segmented" style="width:100%;justify-content:space-between;">
+              <button id="vfilter-all" onclick="App.setVocabFilter('all')" class="seg-btn active" style="flex:1;font-size:12px;padding:5px 6px;">Tất cả</button>
+              <button id="vfilter-unmastered" onclick="App.setVocabFilter('unmastered')" class="seg-btn" style="flex:1;font-size:12px;padding:5px 6px;">Chưa thuộc</button>
+              <button id="vfilter-hard" onclick="App.setVocabFilter('hard')" class="seg-btn" style="flex:1;font-size:12px;padding:5px 6px;">Từ khó ⭐</button>
+            </div>
+          </div>
+          <div id="vc-side-list" class="vocab-list-panel"></div>
+        </aside>
+      </div>
+
+      <!-- 1B. Interactive 米字格 (MiZiGe) Hanzi Writing Pad -->
+      <div id="vocab-writing-view" class="card hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:16px;">
+          <div>
+            <span class="tag tag-primary">Bảng luyện viết chữ Hán Phồn thể (米字格)</span>
+            <h3 id="wp-word-title" class="hanzi" style="font-size:20px;font-weight:900;margin-top:4px;">請問 (qǐngwèn) — Xin hỏi</h3>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button onclick="App.stepVocab(-1)" class="btn btn-sm btn-outline">⬅ Từ trước</button>
+            <button onclick="App.stepVocab(1)" class="btn btn-sm btn-outline">Từ tiếp ➔</button>
+          </div>
+        </div>
+
+        <div class="mizige-stage">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;font-weight:700;color:var(--text-secondary);">Chọn từng chữ trong từ để viết:</span>
+            <div id="wp-char-tabs" style="display:flex;gap:6px;"></div>
+          </div>
+
+          <div class="mizige-canvas-wrap">
+            <canvas id="wp-canvas" width="240" height="240" class="mizige-canvas"></canvas>
+          </div>
+
+          <div id="wp-char-note" style="font-size:13px;color:var(--text-secondary);max-width:540px;text-align:center;"></div>
+          <div id="wp-feedback" style="font-size:13px;font-weight:700;color:var(--primary-text);"></div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+            <button id="wp-guide-btn" onclick="App.toggleWritingGuide()" class="btn btn-sm btn-outline">👁️ Ẩn chữ mẫu</button>
+            <button onclick="App.clearWritingCanvas()" class="btn btn-sm btn-outline">↺ Xóa viết lại</button>
+            <button onclick="App.speakCurrentVocab()" class="btn btn-sm btn-subtle">🔊 Nghe phát âm</button>
+            <button onclick="App.gradeWritingCanvas()" class="btn btn-sm btn-primary">✓ Chấm nét chữ</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 1C. Grammar View -->
+      <div id="vocab-grammar-view" class="hidden">
+        <div id="grammar-list-container" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:16px;"></div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         STEP 2: 造句 ĐẶT CÂU, ĐỌC DỊCH & NGHE CHÉP CHÍNH TẢ
+         ====================================================================== -->
+    <section id="panel-step-sentence" class="hidden">
+      <div class="stage-header">
+        <div class="stage-title-group">
+          <h2>Bước 2: 造句 Đặt câu, Dịch câu &amp; Nghe chép chính tả</h2>
+          <p>Luyện phản xạ lắp ghép cấu trúc câu Phồn thể, đọc dịch cụm từ và nghe chép chính tả.</p>
+        </div>
+        <div class="segmented">
+          <button id="ssub-v2z" onclick="App.setSentenceSubMode('v2z')" class="seg-btn active">🇻🇳 ➔ 🇹🇼 Đặt câu</button>
+          <button id="ssub-z2v" onclick="App.setSentenceSubMode('z2v')" class="seg-btn">🇹🇼 ➔ 🇻🇳 Dịch câu</button>
+          <button id="ssub-dictation" onclick="App.setSentenceSubMode('dictation')" class="seg-btn">🎧 Nghe &amp; Chép</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+          <span id="sent-tag" class="tag tag-primary">Bài 1 (P.1) • Hỏi quý danh</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button onclick="App.stepSentence(-1)" class="btn btn-sm btn-outline">⬅ Câu trước</button>
+            <span id="sent-counter" class="tag">Câu 1 / 9</span>
+            <button onclick="App.stepSentence(1)" class="btn btn-sm btn-outline">Câu tiếp ➔</button>
+          </div>
+        </div>
+
+        <!-- 2A. Vietnamese -> Chinese Sentence Builder & Listening Dictation -->
+        <div id="sent-v2z-view">
+          <div class="prompt-box">
+            <div id="v2z-mode-label" style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">HÃY DỊCH CÂU TIẾNG VIỆT SAU SANG TIẾNG TRUNG PHỒN THỂ</div>
+            <div id="v2z-vi-prompt" style="font-size:20px;font-weight:800;">Xin hỏi quý danh của ngài là gì? Tôi họ Vương, tên là Vương Minh Hoa.</div>
+            <div id="v2z-hint" style="font-size:13px;color:var(--text-secondary);margin-top:6px;">💡 Công thức: 請問您貴姓？ + 我姓...，叫...</div>
+          </div>
+
+          <div id="v2z-answer-well" class="answer-well"></div>
+
+          <div id="v2z-tile-bank" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;"></div>
+
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;padding-top:14px;border-top:1px solid var(--border);">
+            <input id="v2z-manual-input" type="text" class="input-field hanzi" style="flex:1;min-width:220px;" placeholder="Hoặc tự gõ câu chữ Hán Phồn thể vào đây..." onkeydown="if(event.key==='Enter') App.checkV2ZAnswer()" />
+            <button onclick="App.giveV2ZNextTileHint()" class="btn btn-outline" title="Tự động điền đúng 1 thẻ từ tiếp theo">💡 Gợi ý từ tiếp</button>
+            <button onclick="App.resetV2Z()" class="btn btn-outline">↺ Làm lại</button>
+            <button onclick="App.speakCurrentSentence()" class="btn btn-subtle">🔊 Nghe câu</button>
+            <button onclick="App.checkV2ZAnswer()" class="btn btn-primary">✓ Kiểm tra đáp án</button>
+          </div>
+
+          <div id="v2z-feedback" class="card-compact hidden" style="margin-top:16px;"></div>
+        </div>
+
+        <!-- 2B. Chinese -> Vietnamese Reading & Translation -->
+        <div id="sent-z2v-view" class="hidden">
+          <div class="prompt-box" style="text-align:center;">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:10px;">Chạm vào từng cụm chữ Hán để nghe phát âm &amp; xem nghĩa từng từ</div>
+            <div id="z2v-gloss-segments" style="display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-bottom:12px;"></div>
+            <div id="z2v-pinyin" style="font-size:15px;color:var(--primary);font-weight:700;margin-bottom:12px;"></div>
+            <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;">
+              <button onclick="App.speakCurrentSentence('female', false)" class="btn btn-sm btn-primary">👩 Giọng Nữ đọc</button>
+              <button onclick="App.speakCurrentSentence('male', false)" class="btn btn-sm btn-outline">👨 Giọng Nam đọc</button>
+              <button onclick="App.speakCurrentSentence(null, true)" class="btn btn-sm btn-subtle">🐢 Đọc chậm (0.72x)</button>
+            </div>
+          </div>
+
+          <div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:10px;">Chọn bản dịch tiếng Việt đúng nhất:</div>
+          <div id="z2v-options" style="display:flex;flex-direction:column;gap:8px;"></div>
+          <div id="z2v-feedback" class="card-compact hidden" style="margin-top:16px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         STEP 3: 口說 PHÒNG LUYỆN NÓI, BIỂU ĐỒ THANH ĐIỆU & SHADOWING (zh-TW)
+         ====================================================================== -->
+    <section id="panel-step-speak" class="hidden">
+      <div class="stage-header">
+        <div class="stage-title-group">
+          <h2>Bước 3: 口說 Phòng luyện nói, Biểu đồ thanh điệu &amp; Shadowing</h2>
+          <p>Xem bản đồ 4 thanh điệu + quy tắc biến điệu tự động, đọc đuổi Shadowing và thu âm chấm từng chữ.</p>
+        </div>
+        <div class="segmented">
+          <button id="spk-sub-sentence" onclick="App.setSpeakSubMode('sentence')" class="seg-btn active">🗣️ Luyện câu</button>
+          <button id="spk-sub-word" onclick="App.setSpeakSubMode('word')" class="seg-btn">🔤 Luyện từ</button>
+          <button id="spk-sub-roleplay" onclick="App.setSpeakSubMode('roleplay')" class="seg-btn">🎭 Hội thoại</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <!-- Top Item Navigation -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;">
+          <span id="spk-tag" class="tag tag-primary">Bài 1 (P.1) • Luyện nói câu</span>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <a id="spk-open-https-top" href="https://hunghp2002.github.io/hoc-tieng-trung-phon-the/" target="_blank" rel="noopener" class="btn btn-sm btn-outline hidden">🔗 Mở ở tab riêng (HTTPS) để dùng Micro</a>
+            <button onclick="App.stepSpeak(-1)" class="btn btn-sm btn-outline">⬅ Trước</button>
+            <span id="spk-counter" class="tag">Mục 1 / 9</span>
+            <button onclick="App.stepSpeak(1)" class="btn btn-sm btn-outline">Tiếp ➔</button>
+          </div>
+        </div>
+
+        <!-- Roleplay Partner Prompt -->
+        <div id="spk-roleplay-box" class="card-compact hidden" style="margin-bottom:14px;background:var(--ocean-soft);">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;">
+            <div>
+              <div id="spk-rp-speaker" style="font-size:12px;font-weight:800;color:var(--ocean);">🧑‍🏫 Đối tác Đài Loan</div>
+              <div id="spk-rp-qzh" class="hanzi" style="font-size:20px;font-weight:800;margin-top:2px;"></div>
+              <div id="spk-rp-qpy" style="font-size:13px;color:var(--text-secondary);"></div>
+            </div>
+            <button onclick="App.speakRoleplayPartner()" class="btn btn-sm btn-outline">🔊 Nghe câu hỏi</button>
+          </div>
+        </div>
+
+        <!-- Target Sentence Hero + Visual Tone Contour Map + Tone Sandhi Alerts -->
+        <div class="speak-hero">
+          <div style="font-size:12px;color:var(--text-muted);font-weight:700;">CHẠM VÀO TỪNG CHỮ HÁN ĐỂ NGHE PHÁT ÂM RIÊNG CHỮ ĐÓ</div>
+          <div id="spk-target-zh" class="speak-hanzi-line"></div>
+          <div id="spk-target-py" style="font-size:17px;font-weight:700;color:var(--primary);margin-bottom:4px;"></div>
+          <div id="spk-target-vi" style="font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:10px;"></div>
+
+          <!-- Per-character Visual Tone Contour Row -->
+          <div id="spk-tone-contours" class="tone-contour-row"></div>
+
+          <!-- Automatic Tone Sandhi Coaching Alert -->
+          <div id="spk-sandhi-alerts" class="card-compact hidden" style="background:var(--amber-soft);border-color:var(--amber-border);color:var(--amber);font-size:13px;font-weight:700;margin:10px auto;max-width:680px;text-align:left;"></div>
+
+          <div style="display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:10px;">
+            <button onclick="App.speakTargetAudio('female', false)" class="btn btn-sm btn-outline">👩 Nghe mẫu Nữ (雅婷)</button>
+            <button onclick="App.speakTargetAudio('male', false)" class="btn btn-sm btn-outline">👨 Nghe mẫu Nam (雲哲)</button>
+            <button onclick="App.speakTargetAudio(null, true)" class="btn btn-sm btn-subtle">🐢 Nghe mẫu chậm (0.7x)</button>
+            <button onclick="App.startShadowingPractice()" class="btn btn-sm btn-jade" title="Máy đọc mẫu trước, sau đó tự động bật Micro để bạn đọc nhại theo ngay">🎧🎙️ Đọc đuổi Shadowing (Nghe ➔ Tự bật Mic)</button>
+          </div>
+          <div id="spk-tip" style="font-size:13px;color:var(--text-secondary);margin-top:10px;"></div>
+        </div>
+
+        <!-- Primary Microphone Recording Bar -->
+        <div class="mic-bar">
+          <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <button id="spk-mic-btn" onclick="App.toggleMic()" class="btn btn-lg btn-primary">
+              <span>🎙️</span>
+              <span>Bấm để nói (zh-TW)</span>
+            </button>
+            <button id="spk-playback-btn" onclick="SpeechService.playLastRecording()" class="btn btn-outline hidden">
+              ▶️ Nghe lại giọng vừa thu
+            </button>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div id="spk-waveform" class="waveform" aria-hidden="true">
+              <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <span id="spk-status" style="font-size:13px;font-weight:700;color:var(--text-secondary);">Sẵn sàng thu âm</span>
+          </div>
+        </div>
+
+        <!-- Diagnostic Banner -->
+        <div id="spk-diag-box" class="card-compact hidden" style="margin-top:14px;background:var(--amber-soft);border-color:var(--amber-border);">
+          <div id="spk-diag-text" style="font-size:13px;font-weight:600;margin-bottom:10px;"></div>
+          <a id="spk-diag-link" href="https://hunghp2002.github.io/hoc-tieng-trung-phon-the/" target="_blank" rel="noopener" class="btn btn-sm btn-primary">🔗 Mở Phòng Thu Âm ở tab riêng (HTTPS)</a>
+        </div>
+
+        <!-- Recognized Speech Input & Optional Demo Triggers -->
+        <div style="margin-top:16px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:12px;color:var(--text-secondary);">
+            <span>📝 Câu chữ Hán nhận diện từ giọng nói của bạn (hoặc bấm phím 🎤 trên bàn phím để nói trực tiếp):</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+              <span>Xem thử cách chấm:</span>
+              <button onclick="App.runDemoSpeech('perfect')" class="tag tag-jade">Mẫu chuẩn</button>
+              <button onclick="App.runDemoSpeech('near')" class="tag tag-amber">Mẫu lệch thanh</button>
+              <button onclick="App.runDemoSpeech('wrong')" class="tag tag-primary">Mẫu thiếu chữ</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <input id="spk-input" type="text" class="input-field hanzi" style="flex:1;min-width:240px;font-weight:700;" placeholder="Chữ Hán máy nghe được sẽ hiện tại đây..." oninput="App.handleSpeakInputLive(this.value)" onkeydown="if(event.key==='Enter') App.evaluateCurrentSpeech(this.value)" />
+            <button onclick="App.evaluateCurrentSpeech()" class="btn btn-jade">🔍 Chấm phát âm</button>
+          </div>
+        </div>
+
+        <!-- Pronunciation Scorecard Result -->
+        <div id="spk-eval-card" class="card-compact hidden" style="margin-top:18px;">
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding-bottom:12px;border-bottom:1px solid var(--border);">
+            <div id="spk-score-badge" style="width:58px;height:58px;border-radius:14px;background:var(--jade);color:#fff;font-size:18px;font-weight:900;display:flex;align-items:center;justify-content:center;">100%</div>
+            <div>
+              <div id="spk-verdict-title" style="font-size:16px;font-weight:800;">🏆 Phát âm rất chuẩn Đài Loan!</div>
+              <div id="spk-verdict-sub" style="font-size:13px;color:var(--text-secondary);"></div>
+            </div>
+          </div>
+
+          <div id="spk-char-grid" class="char-eval-grid"></div>
+          <div id="spk-teacher-notes" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border);font-size:13px;display:flex;flex-direction:column;gap:4px;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================================
+         STEP 4: 測驗 KIỂM TRA PHẢN XẠ & TIẾN ĐỘ HỌC TẬP
+         ====================================================================== -->
+    <section id="panel-step-test" class="hidden">
+      <div class="stage-header">
+        <div class="stage-title-group">
+          <h2>Bước 4: 測驗 Kiểm tra phản xạ &amp; Tiến độ</h2>
+          <p>Củng cố trí nhớ dài hạn qua trò chơi ghép thẻ, bắt lỗi ngữ pháp và theo dõi từ vựng SRS.</p>
+        </div>
+        <div class="segmented">
+          <button id="tsub-match" onclick="App.setTestSubMode('match')" class="seg-btn active">🀄 Ghép thẻ</button>
+          <button id="tsub-detective" onclick="App.setTestSubMode('detective')" class="seg-btn">🕵️ Bắt lỗi câu</button>
+          <button id="tsub-quiz" onclick="App.setTestSubMode('quiz')" class="seg-btn">⚡ Trắc nghiệm</button>
+          <button id="tsub-progress" onclick="App.setTestSubMode('progress')" class="seg-btn">📊 Tiến độ</button>
+        </div>
+      </div>
+
+      <!-- 4A. Match Game -->
+      <div id="test-view-match" class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <div>
+            <strong style="font-size:16px;">Ghép cặp Chữ Hán Phồn Thể &amp; Nghĩa Tiếng Việt</strong>
+            <div style="font-size:13px;color:var(--text-secondary);">Chạm 1 thẻ chữ Hán và 1 thẻ nghĩa tương ứng trong phạm vi bài đang học.</div>
+          </div>
+          <button onclick="App.initMatchGame()" class="btn btn-sm btn-outline">🔄 Đổi bộ thẻ</button>
+        </div>
+        <div id="match-board" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;"></div>
+      </div>
+
+      <!-- 4B. Grammar Detective -->
+      <div id="test-view-detective" class="card hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <span id="det-tag" class="tag tag-primary">Bài 1 • Bắt lỗi ngữ pháp</span>
+          <button onclick="App.nextDetective()" class="btn btn-sm btn-outline">Câu khác ➔</button>
+        </div>
+        <div class="prompt-box" style="text-align:center;">
+          <div style="font-size:12px;font-weight:700;color:var(--primary-text);">CÂU DƯỚI ĐÂY ĐANG CÓ 1 LỖI NGỮ PHÁP — HÃY CHỌN CÁCH SỬA ĐÚNG:</div>
+          <div id="det-wrong-zh" class="hanzi" style="font-size:28px;font-weight:900;margin-top:8px;"></div>
+        </div>
+        <div id="det-options" style="display:flex;flex-direction:column;gap:8px;"></div>
+        <div id="det-feedback" class="card-compact hidden" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- 4C. Quick Quiz -->
+      <div id="test-view-quiz" class="card hidden">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <span class="tag tag-jade" id="qq-score">Đúng 0 / 0 lượt</span>
+          <button onclick="App.nextQuickQuiz()" class="btn btn-sm btn-outline">Đổi câu ➔</button>
+        </div>
+        <div class="prompt-box" style="text-align:center;">
+          <div id="qq-hanzi" class="hanzi" style="font-size:44px;font-weight:900;"></div>
+          <div id="qq-pinyin" style="font-size:16px;color:var(--primary);font-weight:700;"></div>
+        </div>
+        <div id="qq-options" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;"></div>
+        <div id="qq-feedback" class="card-compact hidden" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- 4D. Progress & Study Plan -->
+      <div id="test-view-progress" class="card hidden">
+        <h3 style="font-size:17px;font-weight:800;margin-bottom:14px;">Bảng tổng kết &amp; Thống kê ghi nhớ SRS</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;margin-bottom:20px;">
+          <div class="card-compact">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:700;">TỪ VỰNG ĐÃ THUỘC (SRS)</div>
+            <div id="prog-vocab-count" style="font-size:24px;font-weight:900;margin-top:4px;">0/50 thuộc</div>
+          </div>
+          <div class="card-compact">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:700;">CÂU ĐÃ HOÀN THÀNH</div>
+            <div id="prog-sent-count" style="font-size:24px;font-weight:900;margin-top:4px;">0 câu</div>
+          </div>
+          <div class="card-compact">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:700;">ĐIỂM PHÁT ÂM TB</div>
+            <div id="prog-speak-avg" style="font-size:24px;font-weight:900;margin-top:4px;color:var(--primary);">Chưa thu</div>
+          </div>
+          <div class="card-compact">
+            <div style="font-size:12px;color:var(--text-muted);font-weight:700;">ĐỘ CHÍNH XÁC QUIZ</div>
+            <div id="prog-quiz-acc" style="font-size:24px;font-weight:900;margin-top:4px;color:var(--jade);">100%</div>
+          </div>
+        </div>
+        <div class="card-compact" style="background:var(--bg-subtle);">
+          <div style="font-weight:800;margin-bottom:4px;">💡 Gợi ý phương pháp học nhanh &amp; nhớ lâu (當代中文課程 1):</div>
+          <p style="font-size:13px;color:var(--text-secondary);">
+            1. Dùng <strong>Âm Hán-Việt + Chiết tự bộ thủ</strong> ở Bước 1 và viết thử 1 lần trên <strong>Ô Mễ Tự Cách</strong> để nhớ mặt chữ Phồn thể.<br />
+            2. Đánh dấu những từ chưa nhớ vào mục <strong>Từ khó ⭐</strong> để lọc ôn riêng.<br />
+            3. Ở Bước 3, bấm <strong>🎧🎙️ Đọc đuổi Shadowing</strong> để bắt chước ngay cao độ và biến điệu của giáo viên Đài Loan.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ========================================================================
+       3. MODAL 1: LESSON & VOCABULARY SCOPE FILTER + VOICE SETTINGS
+       ======================================================================== -->
+  <div id="modal-scope" class="modal-backdrop hidden" onclick="if(event.target===this) App.closeScopeModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:18px;font-weight:800;">📚 Giới hạn phạm vi bài học &amp; Giọng đọc</h3>
+          <p style="font-size:13px;color:var(--text-secondary);">Mọi từ vựng, câu ghép, câu luyện nói và bài kiểm tra sẽ chỉ xuất hiện trong phạm vi bạn chọn.</p>
+        </div>
+        <button onclick="App.closeScopeModal()" class="btn btn-sm btn-subtle">Đóng ✕</button>
+      </div>
+
+      <!-- Voice Settings -->
+      <div style="margin-bottom:18px;padding-bottom:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+        <div>
+          <strong style="font-size:14px;">🔊 Giọng đọc mẫu Đài Loan (zh-TW)</strong>
+          <div style="font-size:12px;color:var(--text-secondary);">Chọn giọng Nữ, giọng Nam hoặc Song thanh</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <div class="segmented">
+            <button id="voice-opt-female" onclick="App.setVoiceOption('female', null)" class="seg-btn active">👩 Nữ (雅婷)</button>
+            <button id="voice-opt-male" onclick="App.setVoiceOption('male', null)" class="seg-btn">👨 Nam (雲哲)</button>
+            <button id="voice-opt-duet" onclick="App.setVoiceOption('duet', null)" class="seg-btn">👫 Song thanh</button>
+          </div>
+          <div class="segmented">
+            <button id="rate-opt-0_8" onclick="App.setVoiceOption(null, 0.8)" class="seg-btn">0.8x</button>
+            <button id="rate-opt-1" onclick="App.setVoiceOption(null, 1.0)" class="seg-btn active">1.0x</button>
+            <button id="rate-opt-1_15" onclick="App.setVoiceOption(null, 1.15)" class="seg-btn">1.15x</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lesson Selection -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <strong style="font-size:14px;">1. Chọn bài học (Bài 1 – Bài 4)</strong>
+        <button onclick="App.handleSelectAllLessons()" class="tag tag-primary">Chọn tất cả Bài 1–4</button>
+      </div>
+      <div id="scope-lessons-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;margin-bottom:16px;"></div>
+
+      <!-- Half-Lesson Part Filter -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;">
+        <strong style="font-size:14px;">2. Giới hạn theo nửa bài (Lộ trình 2 ngày / bài)</strong>
+        <div class="segmented">
+          <button id="scope-part-ALL" onclick="App.handlePartFilter('ALL')" class="seg-btn active">Cả bài (P.1 + P.2)</button>
+          <button id="scope-part-1" onclick="App.handlePartFilter(1)" class="seg-btn">Chỉ nửa đầu (P.1)</button>
+          <button id="scope-part-2" onclick="App.handlePartFilter(2)" class="seg-btn">Chỉ nửa sau (P.2)</button>
+        </div>
+      </div>
+
+      <!-- Individual Word Filter -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <strong style="font-size:14px;">3. Bật / tắt từng từ vựng cụ thể</strong>
+        <div style="display:flex;gap:6px;">
+          <button onclick="App.handleSetAllWords(true)" class="tag">Bật tất cả từ</button>
+          <button onclick="App.handleSetAllWords(false)" class="tag">Bỏ chọn bớt</button>
+        </div>
+      </div>
+      <div id="scope-words-grid" style="display:flex;flex-wrap:wrap;gap:6px;max-height:190px;overflow-y:auto;padding:4px;"></div>
+
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+        <button onclick="App.closeScopeModal()" class="btn btn-primary">✓ Áp dụng phạm vi học</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       4. MODAL 2: 5-DAY COMEBACK MISSION & 15-MINUTE FOCUS TIMER
+       ======================================================================== -->
+  <div id="modal-comeback" class="modal-backdrop hidden" onclick="if(event.target===this) App.closeComebackModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-size:18px;font-weight:800;">🔥 Lộ trình phá băng sau 5 ngày nghỉ học</h3>
+          <p style="font-size:13px;color:var(--text-secondary);">Khởi động nhẹ nhàng trong 15 phút để lấy lại cảm giác chữ Hán Phồn thể và thanh điệu.</p>
+        </div>
+        <button onclick="App.closeComebackModal()" class="btn btn-sm btn-subtle">Đóng ✕</button>
+      </div>
+
+      <!-- 15-Minute Focus Timer -->
+      <div class="card-compact" style="background:var(--bg-subtle);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+        <div>
+          <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">Đồng hồ tập trung Pomodoro</div>
+          <div id="focus-timer-display" style="font-size:32px;font-weight:900;color:var(--primary);">15:00</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button id="focus-timer-btn" onclick="App.toggleFocusTimer()" class="btn btn-primary">▶️ Bắt đầu 15 phút tập trung</button>
+          <button onclick="VoiceService.speak('加油！你已經五天沒學中文了，我們現在開始複習吧！', 'female')" class="btn btn-outline">👩 Cô 雅婷 nhắc học</button>
+          <button onclick="VoiceService.speak('別放棄！每天練習十五分鐘，你的繁體中文一定會進步！', 'male')" class="btn btn-outline">👨 Thầy 雲哲 khích lệ</button>
+        </div>
+      </div>
+
+      <strong style="font-size:14px;display:block;margin-bottom:8px;">3 mục tiêu ngắn cần hoàn thành hôm nay:</strong>
+      <div id="comeback-task-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:18px;"></div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-top:14px;border-top:1px solid var(--border);">
+        <button onclick="App.triggerInstantComeback()" class="btn btn-jade">⚡ Cam kết học ngay &amp; Kích hoạt đồng hồ</button>
+        <button onclick="App.closeComebackModal()" class="btn btn-outline">Quay lại bài học</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       5. MODAL 3: 3 USAGE EXAMPLES & COMPOUND WORD EXPLORER FOR ANY CHARACTER/WORD
+       ======================================================================== -->
+  <div id="modal-examples" class="modal-backdrop hidden" onclick="if(event.target===this) App.closeExamplesModal()">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div id="exm-query-hanzi" class="hanzi" style="font-size:38px;font-weight:900;color:var(--primary);line-height:1;">請問</div>
+          <div>
+            <h3 style="font-size:17px;font-weight:800;">📖 3 Ví dụ sử dụng thực tế &amp; Mở rộng từ</h3>
+            <p id="exm-query-sub" style="font-size:13px;color:var(--text-secondary);"></p>
+          </div>
+        </div>
+        <button onclick="App.closeExamplesModal()" class="btn btn-sm btn-subtle">Đóng ✕</button>
+      </div>
+
+      <!-- Radical Etymology of Clicked Character/Word -->
+      <div id="exm-etymology" class="etymology-box" style="margin-top:0;margin-bottom:14px;"></div>
+
+      <!-- Compound Words Containing This Character -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin-bottom:6px;">🔗 Các từ vựng chứa chữ này (Bấm để chuyển sang 3 ví dụ của từ đó):</div>
+        <div id="exm-compounds" style="display:flex;flex-wrap:wrap;gap:6px;"></div>
+      </div>
+
+      <!-- 3 Contextual Usage Examples -->
+      <div style="font-size:12px;font-weight:800;color:var(--text-muted);text-transform:uppercase;margin-bottom:8px;">💬 3 Câu ví dụ sử dụng theo ngữ cảnh (Nghe mẫu hoặc bấm "Luyện nói câu này"):</div>
+      <div id="exm-examples-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+    </div>
+  </div>
+
+  <!-- Modular JavaScript Architecture -->
+  <script src="js/data/curriculum.js"></script>
+  <script src="js/services/storage.js"></script>
+  <script src="js/services/tts.js"></script>
+  <script src="js/services/stt.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,940 @@
+/* ==========================================================================
+   當代中文課程 1 — Design System & Layout Architecture (Vanilla CSS)
+   Aesthetic: Taiwanese Editorial Minimalism (Warm Paper, Vermilion Seal, Jade)
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Harmonious HSL Color Tokens — Light Mode (Warm Rice Paper & Ink) */
+  --bg: hsl(38, 28%, 97%);
+  --bg-subtle: hsl(36, 22%, 93%);
+  --surface: hsl(0, 0%, 100%);
+  --surface-hover: hsl(36, 25%, 98%);
+  --text: hsl(220, 24%, 14%);
+  --text-secondary: hsl(220, 14%, 38%);
+  --text-muted: hsl(220, 10%, 54%);
+  --border: hsl(34, 18%, 87%);
+  --border-strong: hsl(34, 16%, 78%);
+
+  /* Brand & Pedagogical Accents */
+  --primary: hsl(8, 74%, 50%);          /* Taiwanese Vermilion Seal (印章紅) */
+  --primary-hover: hsl(8, 74%, 44%);
+  --primary-soft: hsl(8, 80%, 95%);
+  --primary-text: hsl(8, 72%, 38%);
+
+  --jade: hsl(160, 64%, 36%);           /* Formosa Jade (翠玉綠) — Correct / Mastered */
+  --jade-soft: hsl(158, 55%, 93%);
+  --jade-border: hsl(158, 45%, 76%);
+
+  --amber: hsl(34, 88%, 44%);           /* Oolong Amber (烏龍珀) — Tone / Warning */
+  --amber-soft: hsl(38, 90%, 94%);
+  --amber-border: hsl(36, 75%, 78%);
+
+  --ocean: hsl(212, 72%, 46%);          /* Male Voice / Grammar Accent */
+  --ocean-soft: hsl(212, 80%, 95%);
+
+  /* Elevation & Radius */
+  --shadow-xs: 0 1px 2px rgba(20, 24, 34, 0.04);
+  --shadow-sm: 0 2px 8px -2px rgba(20, 24, 34, 0.06), 0 1px 3px rgba(20, 24, 34, 0.04);
+  --shadow-md: 0 10px 28px -6px rgba(20, 24, 34, 0.08), 0 2px 6px rgba(20, 24, 34, 0.04);
+  --shadow-lg: 0 20px 44px -12px rgba(20, 24, 34, 0.14);
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-hanzi: 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+}
+
+html.dark {
+  --bg: hsl(222, 20%, 10%);
+  --bg-subtle: hsl(222, 18%, 14%);
+  --surface: hsl(222, 18%, 13%);
+  --surface-hover: hsl(222, 18%, 16%);
+  --text: hsl(38, 25%, 94%);
+  --text-secondary: hsl(220, 14%, 72%);
+  --text-muted: hsl(220, 10%, 56%);
+  --border: hsl(222, 16%, 21%);
+  --border-strong: hsl(222, 16%, 28%);
+
+  --primary: hsl(8, 78%, 58%);
+  --primary-hover: hsl(8, 78%, 52%);
+  --primary-soft: hsla(8, 75%, 55%, 0.14);
+  --primary-text: hsl(8, 85%, 74%);
+
+  --jade: hsl(158, 60%, 46%);
+  --jade-soft: hsla(158, 60%, 44%, 0.14);
+  --jade-border: hsla(158, 55%, 48%, 0.35);
+
+  --amber: hsl(36, 90%, 56%);
+  --amber-soft: hsla(36, 90%, 52%, 0.14);
+  --amber-border: hsla(36, 85%, 54%, 0.35);
+
+  --ocean: hsl(212, 82%, 62%);
+  --ocean-soft: hsla(212, 80%, 56%, 0.15);
+}
+
+/* Base Reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.55;
+  font-size: 15px;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+.hanzi {
+  font-family: var(--font-hanzi);
+  letter-spacing: 0.04em;
+}
+
+button, input, select {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.16s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ==========================================================================
+   1. Top Navigation & Pedagogical Stepper Bar
+   ========================================================================== */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+}
+
+.topbar-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-seal {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--primary);
+  color: #fff;
+  font-family: var(--font-hanzi);
+  font-weight: 900;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-xs);
+  flex-shrink: 0;
+}
+
+.brand-title {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.brand-subtitle {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* 4-Step Curriculum Navigation */
+.step-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--bg-subtle);
+  padding: 4px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+}
+
+.step-tab {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.step-tab:hover {
+  color: var(--text);
+  background: color-mix(in srgb, var(--surface) 60%, transparent);
+}
+
+.step-tab.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.step-num {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border);
+  color: var(--text-secondary);
+}
+
+.step-tab.active .step-num {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* Right Toolbar Pills */
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  box-shadow: var(--shadow-xs);
+}
+
+.pill-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.pill-btn.pill-primary {
+  background: var(--primary-soft);
+  border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
+  color: var(--primary-text);
+}
+
+.pill-btn.pill-alert {
+  background: var(--amber-soft);
+  border-color: var(--amber-border);
+  color: var(--amber);
+}
+
+.pill-btn.pill-jade {
+  background: var(--jade-soft);
+  border-color: var(--jade-border);
+  color: var(--jade);
+}
+
+/* Subtle 1-Line Comeback Strip (Dismissible, non-intrusive) */
+.comeback-strip {
+  background: var(--amber-soft);
+  border-bottom: 1px solid var(--amber-border);
+  padding: 8px 20px;
+  font-size: 13px;
+}
+
+.comeback-strip-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   2. Main Workspace Container
+   ========================================================================== */
+.workspace {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 20px 64px;
+}
+
+/* Context Sub-Header inside Workspace */
+.stage-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.stage-title-group h1,
+.stage-title-group h2 {
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.stage-title-group p {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Segmented Mode Switcher */
+.segmented {
+  display: inline-flex;
+  background: var(--bg-subtle);
+  padding: 3px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  gap: 3px;
+}
+
+.seg-btn {
+  padding: 6px 13px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.seg-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 28px;
+  box-shadow: var(--shadow-sm);
+}
+
+.card-compact {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-xs);
+}
+
+/* Badges & Tags */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.tag-primary {
+  background: var(--primary-soft);
+  color: var(--primary-text);
+}
+
+.tag-jade {
+  background: var(--jade-soft);
+  color: var(--jade);
+}
+
+.tag-amber {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  font-weight: 700;
+  border: 1px solid transparent;
+}
+
+.btn-sm {
+  padding: 7px 12px;
+  font-size: 12px;
+  border-radius: var(--radius-sm);
+}
+
+.btn-lg {
+  padding: 13px 24px;
+  font-size: 15px;
+  border-radius: var(--radius-md);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: var(--shadow-xs);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btn-jade {
+  background: var(--jade);
+  color: #fff;
+}
+
+.btn-jade:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.btn-outline {
+  background: var(--surface);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.btn-outline:hover:not(:disabled) {
+  background: var(--bg-subtle);
+  border-color: var(--border-strong);
+}
+
+.btn-subtle {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.btn-subtle:hover:not(:disabled) {
+  color: var(--text);
+  background: var(--border);
+}
+
+/* ==========================================================================
+   3. Step 1: Vocabulary & Grammar Layout
+   ========================================================================== */
+.vocab-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.flashcard-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 28px 24px;
+  position: relative;
+}
+
+.hanzi-display {
+  font-family: var(--font-hanzi);
+  font-size: 56px;
+  font-weight: 900;
+  line-height: 1.15;
+  color: var(--text);
+  margin: 10px 0 6px;
+}
+
+.pinyin-display {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 6px;
+}
+
+.meaning-display {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+
+.example-box {
+  width: 100%;
+  background: var(--bg-subtle);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  text-align: left;
+  margin-top: 12px;
+  border: 1px solid var(--border);
+}
+
+.vocab-list-panel {
+  max-height: 460px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.vocab-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  text-align: left;
+  width: 100%;
+}
+
+.vocab-row:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-hover);
+}
+
+.vocab-row.active {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+}
+
+/* ==========================================================================
+   4. Step 2: Sentence Builder & Reading Translation
+   ========================================================================== */
+.prompt-box {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  margin-bottom: 20px;
+}
+
+.answer-well {
+  min-height: 68px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border-strong);
+  background: var(--bg);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  transition: border-color 0.16s ease;
+}
+
+.answer-well.filled {
+  border-style: solid;
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.word-tile {
+  padding: 9px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-size: 18px;
+  font-weight: 700;
+  box-shadow: 0 2px 0 var(--border);
+}
+
+.word-tile:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.word-tile.tile-picked {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  box-shadow: none;
+}
+
+.input-field {
+  width: 100%;
+  padding: 11px 15px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input-field:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* ==========================================================================
+   5. Step 3: Speaking Studio (zh-TW)
+   ========================================================================== */
+.speak-hero {
+  text-align: center;
+  padding: 24px 20px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+}
+
+.speak-hanzi-line {
+  font-family: var(--font-hanzi);
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1.3;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin: 12px 0 8px;
+}
+
+.speak-char {
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.speak-char:hover {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.speak-char.char-active {
+  background: var(--amber);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.speak-char.char-done {
+  color: var(--jade);
+}
+
+.mic-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  flex-wrap: wrap;
+}
+
+.btn-mic-recording {
+  background: hsl(0, 78%, 52%) !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 4px hsla(0, 78%, 52%, 0.22) !important;
+  animation: pulse-ring 1.4s infinite;
+}
+
+@keyframes pulse-ring {
+  0%, 100% { box-shadow: 0 0 0 3px hsla(0, 78%, 52%, 0.22); }
+  50% { box-shadow: 0 0 0 8px hsla(0, 78%, 52%, 0.1); }
+}
+
+.waveform {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 28px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+}
+
+.waveform span {
+  width: 4px;
+  height: 8px;
+  border-radius: 99px;
+  background: var(--primary);
+  transition: height 0.08s ease;
+}
+
+/* Character Evaluation Cards */
+.char-eval-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.char-eval-card {
+  min-width: 72px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  background: var(--surface);
+}
+
+.char-eval-card.status-exact {
+  border-color: var(--jade-border);
+  background: var(--jade-soft);
+}
+
+.char-eval-card.status-near {
+  border-color: var(--amber-border);
+  background: var(--amber-soft);
+}
+
+.char-eval-card.status-missing {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  background: var(--primary-soft);
+}
+
+/* ==========================================================================
+   6. Modals / Drawers (Scope Filter & Progress/5-Day Comeback)
+   ========================================================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(15, 18, 28, 0.48);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-card {
+  width: 100%;
+  max-width: 680px;
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px 26px;
+  box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 18px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .vocab-grid {
+    grid-template-columns: 1fr;
+  }
+  .hanzi-display {
+    font-size: 44px;
+  }
+  .speak-hanzi-line {
+    font-size: 28px;
+  }
+  .card {
+    padding: 20px;
+  }
+  .step-nav {
+    width: 100%;
+    overflow-x: auto;
+  }
+}
+
+/* ==========================================================================
+   7. Learning Accelerator Components (Etymology, SRS, Writing Pad, Tone Map)
+   ========================================================================== */
+.hv-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  background: var(--amber-soft);
+  color: var(--amber);
+  border: 1px solid var(--amber-border);
+  margin-bottom: 6px;
+}
+
+.etymology-box {
+  width: 100%;
+  background: color-mix(in srgb, var(--primary-soft) 55%, var(--surface));
+  border: 1px solid color-mix(in srgb, var(--primary) 22%, var(--border));
+  border-radius: var(--radius-md);
+  padding: 12px 15px;
+  text-align: left;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.srs-bar {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.srs-btn {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+}
+
+.srs-btn:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-subtle);
+}
+
+.srs-btn.active-hard {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--primary-text);
+}
+
+.srs-btn.active-good {
+  background: var(--amber-soft);
+  border-color: var(--amber-border);
+  color: var(--amber);
+}
+
+.srs-btn.active-easy {
+  background: var(--jade-soft);
+  border-color: var(--jade-border);
+  color: var(--jade);
+}
+
+/* 米字格 (Mi Zi Ge) Traditional Character Writing Pad */
+.mizige-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.mizige-canvas-wrap {
+  position: relative;
+  width: 240px;
+  height: 240px;
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--primary);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  touch-action: none;
+}
+
+.mizige-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: crosshair;
+}
+
+/* Visual Tone Contour & Tone Sandhi Coaching */
+.tone-contour-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.tone-chip {
+  padding: 5px 10px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 58px;
+  cursor: pointer;
+}
+
+.tone-chip:hover {
+  border-color: var(--primary);
+}
+
+.tone-chip.sandhi-changed {
+  border-color: var(--amber-border);
+  background: var(--amber-soft);
+}
+
+.kbd-chip {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 5px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
